@@ -10,10 +10,6 @@ import java.time.LocalDateTime
 @Table(name = "members")
 @EntityListeners(AuditingEntityListener::class)
 class Member(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
-
     @Column(unique = true, nullable = false)
     val username: String,
 
@@ -21,13 +17,17 @@ class Member(
     var name: String,
 
     @Column(nullable = false, length = 20)
-    var role: String,
+    var role: String
+) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    val createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime? = null
 
     @LastModifiedDate
     @Column(nullable = false)
     var updatedAt: LocalDateTime? = null
-)
+}
