@@ -1,5 +1,12 @@
 package my.reviewing.reviewing_V2.member.controller
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+@Tag(name = "로그인/회원가입 API")
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(
@@ -24,7 +32,61 @@ class AuthController(
         private val logger = LoggerFactory.getLogger(AuthController::class.java)
     }
 
-    // OAuth2 로그인 후 refresh token(쿠카)으로 access token 발급
+    @Operation(
+        summary = "로그인 후 Access Token 발급",
+        description = "OAuth2 로그인 후 refresh token(쿠키)으로 access token 발급. Authorization 헤더로 Bearer 형식의 access token이 반환"
+    )
+    @ApiResponses(
+        value = [
+            SwaggerApiResponse(
+                responseCode = "200",
+                description = "Access token 발급 성공",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponse::class),
+                    examples = [ExampleObject(
+                        value = """{"success": true, "data": null, "error": null}"""
+                    )]
+                )],
+                headers = [io.swagger.v3.oas.annotations.headers.Header(
+                    name = "Authorization",
+                    description = "Bearer {access_token}",
+                    schema = Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+                )]
+            ),
+            SwaggerApiResponse(
+                responseCode = "401",
+                description = "Refresh token 없음, 만료, 또는 유효하지 않음",
+                content = [Content(
+                    mediaType = "application/json",
+                    examples = [
+                        ExampleObject(
+                            name = "Refresh token 없음",
+                            value = """{"success": false, "data": null, "error": {"code": "AUTH_401_UNAUTHORIZED", "message": "Refresh token이 없습니다.", "details": null}}"""
+                        ),
+                        ExampleObject(
+                            name = "Refresh token 만료",
+                            value = """{"success": false, "data": null, "error": {"code": "AUTH_401_EXPIRED_REFRESH", "message": "Refresh token이 만료되었습니다.", "details": null}}"""
+                        ),
+                        ExampleObject(
+                            name = "유효하지 않은 Refresh token",
+                            value = """{"success": false, "data": null, "error": {"code": "AUTH_401_INVALID_REFRESH", "message": "유효하지 않은 refresh token입니다.", "details": null}}"""
+                        )
+                    ]
+                )]
+            ),
+            SwaggerApiResponse(
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
+                content = [Content(
+                    mediaType = "application/json",
+                    examples = [ExampleObject(
+                        value = """{"success": false, "data": null, "error": {"code": "COMMON_404_NOT_FOUND", "message": "사용자를 찾을 수 없습니다.", "details": null}}"""
+                    )]
+                )]
+            )
+        ]
+    )
     @PostMapping("/access")
     fun issueAccessToken(request: HttpServletRequest, response: HttpServletResponse): ApiResponse<Unit> {
         // 1. 쿠키에서 refresh token 가져오기 (무조건 있어야 함)
@@ -62,7 +124,65 @@ class AuthController(
         return ApiResponse.ok()
     }
 
-    // refresh 받아서 access, refresh 다시 받는 api
+    @Operation(
+        summary = "Access, Refresh Token 재발급",
+        description = "Refresh token(쿠키)으로 새로운 access token과 refresh token을 재발급합니다. Authorization 헤더로 Bearer 형식의 access token이, refresh 쿠키로 새 refresh token이 반환됩니다."
+    )
+    @ApiResponses(
+        value = [
+            SwaggerApiResponse(
+                responseCode = "200",
+                description = "토큰 재발급 성공",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponse::class),
+                    examples = [ExampleObject(
+                        value = """{"success": true, "data": null, "error": null}"""
+                    )]
+                )],
+                headers = [io.swagger.v3.oas.annotations.headers.Header(
+                    name = "Authorization",
+                    description = "Bearer {access_token}",
+                    schema = Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+                ), io.swagger.v3.oas.annotations.headers.Header(
+                    name = "Set-Cookie",
+                    description = "refresh={refresh_token}; Max-Age=86400; Path=/; HttpOnly",
+                    schema = Schema(type = "string", example = "refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Max-Age=86400; Path=/; HttpOnly")
+                )]
+            ),
+            SwaggerApiResponse(
+                responseCode = "401",
+                description = "Refresh token 없음, 만료, 또는 유효하지 않음",
+                content = [Content(
+                    mediaType = "application/json",
+                    examples = [
+                        ExampleObject(
+                            name = "Refresh token 없음",
+                            value = """{"success": false, "data": null, "error": {"code": "AUTH_401_UNAUTHORIZED", "message": "Refresh token이 없습니다.", "details": null}}"""
+                        ),
+                        ExampleObject(
+                            name = "Refresh token 만료",
+                            value = """{"success": false, "data": null, "error": {"code": "AUTH_401_EXPIRED_REFRESH", "message": "Refresh token이 만료되었습니다.", "details": null}}"""
+                        ),
+                        ExampleObject(
+                            name = "유효하지 않은 Refresh token",
+                            value = """{"success": false, "data": null, "error": {"code": "AUTH_401_INVALID_REFRESH", "message": "유효하지 않은 refresh token입니다.", "details": null}}"""
+                        )
+                    ]
+                )]
+            ),
+            SwaggerApiResponse(
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
+                content = [Content(
+                    mediaType = "application/json",
+                    examples = [ExampleObject(
+                        value = """{"success": false, "data": null, "error": {"code": "COMMON_404_NOT_FOUND", "message": "사용자를 찾을 수 없습니다.", "details": null}}"""
+                    )]
+                )]
+            )
+        ]
+    )
     @PostMapping("/reissue")
     fun reissue(request: HttpServletRequest, response: HttpServletResponse): ApiResponse<Unit> {
         // 1. 쿠키에서 refresh token 가져오기
@@ -104,7 +224,30 @@ class AuthController(
         return ApiResponse.ok()
     }
 
-    // 로그아웃
+    @Operation(
+        summary = "로그아웃",
+        description = "Refresh token 쿠키를 삭제하여 로그아웃합니다."
+    )
+    @ApiResponses(
+        value = [
+            SwaggerApiResponse(
+                responseCode = "200",
+                description = "로그아웃 성공",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponse::class),
+                    examples = [ExampleObject(
+                        value = """{"success": true, "data": null, "error": null}"""
+                    )]
+                )],
+                headers = [io.swagger.v3.oas.annotations.headers.Header(
+                    name = "Set-Cookie",
+                    description = "refresh=; Max-Age=0; Path=/",
+                    schema = Schema(type = "string", example = "refresh=; Max-Age=0; Path=/")
+                )]
+            )
+        ]
+    )
     @PostMapping("/logout")
     fun logout(response: HttpServletResponse): ApiResponse<Unit> {
         // refresh token 쿠키 삭제

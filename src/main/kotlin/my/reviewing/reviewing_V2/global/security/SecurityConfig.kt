@@ -63,6 +63,7 @@ class SecurityConfig(
             auth
 //                .requestMatchers("/").permitAll()
 //                .requestMatchers("/api/auth/refresh").permitAll()
+//                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().permitAll()
         }
 
