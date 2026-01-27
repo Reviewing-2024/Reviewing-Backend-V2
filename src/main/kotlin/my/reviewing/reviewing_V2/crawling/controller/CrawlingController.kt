@@ -2,9 +2,14 @@ package my.reviewing.reviewing_V2.crawling.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import my.reviewing.reviewing_V2.crawling.entity.Course
 import my.reviewing.reviewing_V2.crawling.entity.Platform
+import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.crawling.repository.PlatformRepository
 import my.reviewing.reviewing_V2.global.api.ApiResponse
+import org.springframework.batch.core.JobParametersBuilder
+import org.springframework.batch.core.configuration.JobRegistry
+import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,7 +20,10 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/crawling")
 class CrawlingController(
-    private val platformRepository: PlatformRepository
+    private val platformRepository: PlatformRepository,
+    private val jobLauncher: JobLauncher,
+    private val jobRegistry: JobRegistry,
+    private val courseRepository: CourseRepository
 ) {
 
     @Operation(
@@ -37,5 +45,20 @@ class CrawlingController(
         return ResponseEntity.ok().body(ApiResponse.ok(savePlatform))
     }
 
+    @Operation(
+        summary = "노마드코더 강의 크롤링 실행"
+    )
+    @PostMapping("/courses/nomadcoders")
+    fun crawlingNomadcodersCourses(
+        @RequestParam jobName: String
+    ): ResponseEntity<ApiResponse<List<Course>>> {
 
+        val jobParameters = JobParametersBuilder()
+            .addLong("timestamp", System.currentTimeMillis())
+            .toJobParameters()
+
+        jobLauncher.run(jobRegistry.getJob(jobName), jobParameters)
+
+        return ResponseEntity.ok().body(ApiResponse.ok(courseRepository.findAll()))
+    }
 }

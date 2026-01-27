@@ -13,17 +13,19 @@ import jakarta.persistence.Table
 @Table(name = "categories")
 class Category (
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
-
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     val name: String,
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     val slug: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     val platform: Platform
 
-)
+) {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null
+
+}

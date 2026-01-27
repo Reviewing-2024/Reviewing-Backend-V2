@@ -11,14 +11,16 @@ import jakarta.persistence.Table
 @Table(name = "platforms")
 class Platform (
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
-
     @Column(unique = true, nullable = false)
     val koreanName: String,
 
     @Column(unique = true, nullable = false)
     val englishName: String,
 
-)
+) {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null
+
+}
