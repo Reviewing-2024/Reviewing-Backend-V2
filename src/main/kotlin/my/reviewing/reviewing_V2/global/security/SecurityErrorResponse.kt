@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletResponse
 import my.reviewing.reviewing_V2.global.api.ApiError
 import my.reviewing.reviewing_V2.global.api.ApiResponse
 import my.reviewing.reviewing_V2.global.error.ErrorCode
-import tools.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.nio.charset.StandardCharsets
 
 fun writeErrorResponse(
