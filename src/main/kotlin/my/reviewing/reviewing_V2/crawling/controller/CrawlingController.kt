@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import my.reviewing.reviewing_V2.crawling.entity.Course
 import my.reviewing.reviewing_V2.crawling.entity.Platform
 import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
-import my.reviewing.reviewing_V2.crawling.repository.PlatformRepository
+import my.reviewing.reviewing_V2.crawling.service.CrawlingService
 import my.reviewing.reviewing_V2.global.api.ApiResponse
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.configuration.JobRegistry
@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/crawling")
 class CrawlingController(
-    private val platformRepository: PlatformRepository,
     private val jobLauncher: JobLauncher,
     private val jobRegistry: JobRegistry,
-    private val courseRepository: CourseRepository
+    private val courseRepository: CourseRepository,
+    private val crawlingService: CrawlingService
 ) {
 
     @Operation(
@@ -35,14 +35,9 @@ class CrawlingController(
         @RequestParam englishName: String
     ): ResponseEntity<ApiResponse<Platform>> {
 
-        val platform = Platform(
-            koreanName = koreanName,
-            englishName = englishName
-        )
+        return ResponseEntity.ok()
+            .body(ApiResponse.ok(crawlingService.createPlatform(koreanName, englishName)))
 
-        val savePlatform = platformRepository.save(platform)
-
-        return ResponseEntity.ok().body(ApiResponse.ok(savePlatform))
     }
 
     @Operation(
