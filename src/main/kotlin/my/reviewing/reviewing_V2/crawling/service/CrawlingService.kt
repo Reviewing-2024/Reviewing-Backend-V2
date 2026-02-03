@@ -9,7 +9,12 @@ import my.reviewing.reviewing_V2.crawling.repository.PlatformRepository
 import my.reviewing.reviewing_V2.crawling.repository.SubCategoryRepository
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
+import org.slf4j.LoggerFactory
+import org.springframework.batch.core.JobParametersBuilder
+import org.springframework.batch.core.configuration.JobRegistry
+import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.core.io.ClassPathResource
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,8 +23,30 @@ class CrawlingService(
     private val platformRepository: PlatformRepository,
     private val categoryRepository: CategoryRepository,
     private val subCategoryRepository: SubCategoryRepository,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val jobLauncher: JobLauncher,
+    private val jobRegistry: JobRegistry
 ) {
+
+    private val log = LoggerFactory.getLogger(CrawlingService::class.java)
+
+    @Async("crawlingExecutor")
+    fun runCrawlingJobAsync(jobName: String, jobId: String) {
+        log.info("비동기 크롤링 시작 - jobName: {}, jobId: {}, thread: {}",
+            jobName, jobId, Thread.currentThread().name)
+
+        try {
+            val jobParameters = JobParametersBuilder()
+                .addString("jobId", jobId)
+                .toJobParameters()
+
+            val jobExecution = jobLauncher.run(jobRegistry.getJob(jobName), jobParameters)
+
+            log.info("크롤링 완료 - jobId: {}, status: {}", jobId, jobExecution.status)
+        } catch (e: Exception) {
+            log.error("크롤링 실패 - jobId: {}, error: {}", jobId, e.message, e)
+        }
+    }
 
     fun createPlatform(koreanName: String, englishName: String): Platform {
 

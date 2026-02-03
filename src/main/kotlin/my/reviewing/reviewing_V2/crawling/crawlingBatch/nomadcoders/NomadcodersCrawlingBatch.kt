@@ -1,5 +1,6 @@
-package my.reviewing.reviewing_V2.crawling.service.nomadcoders
+package my.reviewing.reviewing_V2.crawling.crawlingBatch.nomadcoders
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import my.reviewing.reviewing_V2.crawling.entity.Course
 import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.crawling.repository.PlatformRepository
@@ -22,7 +23,8 @@ class NomadcodersCrawlingBatch(
     private val jobRepository: JobRepository,
     private val platformTransactionManager: PlatformTransactionManager,
     private val courseRepository: CourseRepository,
-    private val platformRepository: PlatformRepository
+    private val platformRepository: PlatformRepository,
+    private val objectMapper: ObjectMapper
 ) {
 
     private val log = LoggerFactory.getLogger(NomadcodersCrawlingBatch::class.java)
@@ -51,7 +53,7 @@ class NomadcodersCrawlingBatch(
 
     @Bean
     fun nomadcodersReader(): ItemReader<Course> {
-        return NomadcodersReader(platformRepository)
+        return NomadcodersReader(platformRepository, objectMapper)
     }
 
     @Bean
@@ -60,11 +62,11 @@ class NomadcodersCrawlingBatch(
             val existingCourse =
                 courseRepository.findByPlatformAndSlug(course.platform, course.slug)
             if (existingCourse != null) {
-                log.debug("이미 존재하는 강의, 건너뛰기: {}", course.title)
-                null  // 이미 존재하면 건너뛰기
+//                log.debug("이미 존재하는 강의, 건너뛰기: {}", course.title)
+                null
             } else {
-                log.debug("새 강의 저장 대상: {}", course.title)
-                course  // 새 강의면 저장
+//                log.debug("새 강의 저장 대상: {}", course.title)
+                course
             }
         }
     }
