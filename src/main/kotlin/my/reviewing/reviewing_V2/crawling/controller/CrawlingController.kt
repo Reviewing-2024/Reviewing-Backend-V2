@@ -41,6 +41,16 @@ class CrawlingController(
     }
 
     @Operation(
+        summary = "인프런 카테고리 생성",
+        description = "inflearn_categories.json 파일을 읽어 Category, SubCategory 테이블에 저장"
+    )
+    @PostMapping("/categories/inflearn")
+    fun createInflearnCategory(): ResponseEntity<ApiResponse<Map<String, Int>>> {
+        val result = crawlingService.createInflearnCategories()
+        return ResponseEntity.ok().body(ApiResponse.ok(result))
+    }
+
+    @Operation(
         summary = "노마드코더 강의 크롤링 실행"
     )
     @PostMapping("/courses/nomadcoders")

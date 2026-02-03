@@ -1,0 +1,408 @@
+[
+  {
+    "slug": "artificial-intelligence",
+    "title": "AI 기술",
+    "children": [
+      {
+        "slug": "ai-agent-development",
+        "title": "AI에이전트 개발"
+      },
+      {
+        "slug": "dl-ml",
+        "title": "딥러닝 · 머신러닝"
+      },
+      {
+        "slug": "computer-vision",
+        "title": "컴퓨터 비전"
+      },
+      {
+        "slug": "natural-language-processing",
+        "title": "자연어 처리"
+      },
+      {
+        "slug": "ai-besides",
+        "title": "인공지능 기타"
+      }
+    ]
+  },
+  {
+    "slug": "Applied-ai",
+    "title": "AI 활용(AX)",
+    "children": [
+      {
+        "slug": "AI-Essentials",
+        "title": "AI 시작하기"
+      },
+      {
+        "slug": "Applied-AI-Development",
+        "title": "AI 개발 활용"
+      },
+      {
+        "slug": "AI-for-Work",
+        "title": "AI 실무 활용"
+      },
+      {
+        "slug": "creative-ai",
+        "title": "AI 크리에이티브"
+      }
+    ]
+  },
+  {
+    "slug": "it-programming",
+    "title": "개발 · 프로그래밍",
+    "children": [
+      {
+        "slug": "web-dev",
+        "title": "웹 개발"
+      },
+      {
+        "slug": "front-end",
+        "title": "프론트엔드"
+      },
+      {
+        "slug": "ai-coding",
+        "title": "AI 코딩"
+      },
+      {
+        "slug": "back-end",
+        "title": "백엔드"
+      },
+      {
+        "slug": "full-stack",
+        "title": "풀스택"
+      },
+      {
+        "slug": "mobile-app",
+        "title": "모바일 앱 개발"
+      },
+      {
+        "slug": "programming-lang",
+        "title": "프로그래밍 언어"
+      },
+      {
+        "slug": "algorithm",
+        "title": "알고리즘 · 자료구조"
+      },
+      {
+        "slug": "database-dev",
+        "title": "데이터베이스"
+      },
+      {
+        "slug": "devops-infra",
+        "title": "데브옵스 · 인프라"
+      },
+      {
+        "slug": "sw-test",
+        "title": "소프트웨어 테스트"
+      },
+      {
+        "slug": "programming-tool",
+        "title": "개발 도구"
+      },
+      {
+        "slug": "web-publishing",
+        "title": "웹 퍼블리싱"
+      },
+      {
+        "slug": "desktop-application",
+        "title": "데스크톱 앱 개발"
+      },
+      {
+        "slug": "vr-ar",
+        "title": "VR/AR"
+      },
+      {
+        "slug": "certificate-programming",
+        "title": "개발 · 프로그래밍 자격증"
+      },
+      {
+        "slug": "dev-besides",
+        "title": "개발 · 프로그래밍 기타"
+      }
+    ]
+  },
+  {
+    "slug": "game-dev-all",
+    "title": "게임 개발",
+    "children": [
+      {
+        "slug": "game-programming",
+        "title": "게임 프로그래밍"
+      },
+      {
+        "slug": "game-manage",
+        "title": "게임 기획"
+      },
+      {
+        "slug": "game-art",
+        "title": "게임 아트 · 그래픽"
+      },
+      {
+        "slug": "game-besides",
+        "title": "게임 개발 기타"
+      }
+    ]
+  },
+  {
+    "slug": "data-science",
+    "title": "데이터 사이언스",
+    "children": [
+      {
+        "slug": "data-analysis",
+        "title": "데이터 분석"
+      },
+      {
+        "slug": "data-engineering",
+        "title": "데이터 엔지니어링"
+      },
+      {
+        "slug": "certificate-datascience",
+        "title": "데이터 사이언스 자격증"
+      },
+      {
+        "slug": "data-besides",
+        "title": "데이터 사이언스 기타"
+      }
+    ]
+  },
+  {
+    "slug": "it",
+    "title": "보안 · 네트워크",
+    "children": [
+      {
+        "slug": "security",
+        "title": "보안"
+      },
+      {
+        "slug": "network",
+        "title": "네트워크"
+      },
+      {
+        "slug": "system",
+        "title": "시스템 · 운영체제"
+      },
+      {
+        "slug": "cloud",
+        "title": "클라우드"
+      },
+      {
+        "slug": "blockchain",
+        "title": "블록체인"
+      },
+      {
+        "slug": "certificate-security",
+        "title": "보안 · 네트워크 자격증"
+      },
+      {
+        "slug": "it-besides",
+        "title": "보안 · 네트워크 기타"
+      }
+    ]
+  },
+  {
+    "slug": "hardware",
+    "title": "하드웨어",
+    "children": [
+      {
+        "slug": "computer-architecture",
+        "title": "컴퓨터 구조"
+      },
+      {
+        "slug": "embedded-iot",
+        "title": "임베디드 · IoT"
+      },
+      {
+        "slug": "semiconductor",
+        "title": "반도체"
+      },
+      {
+        "slug": "robotics",
+        "title": "로봇공학"
+      },
+      {
+        "slug": "mobility",
+        "title": "모빌리티"
+      },
+      {
+        "slug": "certificate-hardware",
+        "title": "하드웨어 자격증"
+      },
+      {
+        "slug": "hardware-besides",
+        "title": "하드웨어 기타"
+      }
+    ]
+  },
+  {
+    "slug": "design",
+    "title": "디자인 · 아트",
+    "children": [
+      {
+        "slug": "3d-modeling",
+        "title": "CAD · 3D 모델링"
+      },
+      {
+        "slug": "ux-ui",
+        "title": "UX/UI"
+      },
+      {
+        "slug": "graphic-design",
+        "title": "그래픽 디자인"
+      },
+      {
+        "slug": "webtoon",
+        "title": "웹툰 · 이모티콘"
+      },
+      {
+        "slug": "video-editing",
+        "title": "사진 · 영상"
+      },
+      {
+        "slug": "sound",
+        "title": "사운드"
+      },
+      {
+        "slug": "certificate-design",
+        "title": "디자인 자격증"
+      },
+      {
+        "slug": "creative-besides",
+        "title": "디자인 기타"
+      }
+    ]
+  },
+  {
+    "slug": "business",
+    "title": "기획 · 경영 · 마케팅",
+    "children": [
+      {
+        "slug": "project-manage",
+        "title": "기획 · PM· PO"
+      },
+      {
+        "slug": "marketing",
+        "title": "마케팅"
+      },
+      {
+        "slug": "management",
+        "title": "경영 · 전략"
+      },
+      {
+        "slug": "certificate-office",
+        "title": "기획 · 경영 · 마케팅 자격증"
+      },
+      {
+        "slug": "business-besides",
+        "title": "기획 · 경영 · 마케팅 기타"
+      }
+    ]
+  },
+  {
+    "slug": "foreign-language",
+    "title": "외국어",
+    "children": [
+      {
+        "slug": "german",
+        "title": "독일어"
+      },
+      {
+        "slug": "chinese",
+        "title": "중국어"
+      },
+      {
+        "slug": "japanese",
+        "title": "일본어"
+      },
+      {
+        "slug": "english",
+        "title": "영어"
+      },
+      {
+        "slug": "spanish",
+        "title": "스페인어"
+      }
+    ]
+  },
+  {
+    "slug": "productivity",
+    "title": "업무 생산성",
+    "children": [
+      {
+        "slug": "task-automation",
+        "title": "업무 자동화"
+      },
+      {
+        "slug": "office",
+        "title": "오피스"
+      },
+      {
+        "slug": "productivity-tools",
+        "title": "생산성 도구"
+      },
+      {
+        "slug": "productivity-besides",
+        "title": "업무 생산성 기타"
+      }
+    ]
+  },
+  {
+    "slug": "career",
+    "title": "커리어 · 자기계발",
+    "children": [
+      {
+        "slug": "get-jobs",
+        "title": "취업 · 이직"
+      },
+      {
+        "slug": "business-start-up",
+        "title": "창업 · 부업"
+      },
+      {
+        "slug": "personal-branding",
+        "title": "개인 브랜딩"
+      },
+      {
+        "slug": "Hobby",
+        "title": "취미"
+      },
+      {
+        "slug": "finance",
+        "title": "금융 ·  재테크"
+      },
+      {
+        "slug": "lifestyle",
+        "title": "교양"
+      },
+      {
+        "slug": "career-besides",
+        "title": "커리어 · 자기계발 기타"
+      }
+    ]
+  },
+  {
+    "slug": "academics",
+    "title": "대학 교육",
+    "children": [
+      {
+        "slug": "math",
+        "title": "수학"
+      },
+      {
+        "slug": "engineering",
+        "title": "공학"
+      },
+      {
+        "slug": "business-economics",
+        "title": "상경"
+      },
+      {
+        "slug": "natural-science",
+        "title": "자연과학"
+      },
+      {
+        "slug": "academic-besides",
+        "title": "대학 교육 기타"
+      }
+    ]
+  }
+]
