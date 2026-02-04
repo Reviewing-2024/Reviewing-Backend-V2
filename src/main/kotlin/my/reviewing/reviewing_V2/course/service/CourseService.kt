@@ -21,8 +21,8 @@ class CourseService(
 
     @Transactional(readOnly = true)
     fun getCourses(
-        platforms: List<String>?,
-        categories: List<String>?,
+        platform: String?,
+        category: String?,
         subCategories: List<String>?,
         sort: String,
         page: Int,
@@ -31,25 +31,25 @@ class CourseService(
         val qCourse = QCourse.course
         val builder = BooleanBuilder()
 
-        // 플랫폼 필터 (OR) — Course.platform.englishName
-        if (!platforms.isNullOrEmpty()) {
-            builder.and(qCourse.platform.englishName.`in`(platforms))
+        // 플랫폼 필터 (단일) — Course.platform.englishName
+        if (platform != null) {
+            builder.and(qCourse.platform.englishName.eq(platform))
         }
 
-        // 카테고리 필터 (OR) — EXISTS subquery: SubCategoryCourse → SubCategory → Category
-        if (!categories.isNullOrEmpty()) {
+        // 카테고리 필터 (단일) — EXISTS subquery: SubCategoryCourse → SubCategory → Category
+        if (category != null) {
             val scc = QSubCategoryCourse("scc1")
             builder.and(
                 JPAExpressions.selectOne()
                     .from(scc)
                     .where(
                         scc.course.eq(qCourse),
-                        scc.subCategory.category.slug.`in`(categories)
+                        scc.subCategory.category.slug.eq(category)
                     ).exists()
             )
         }
 
-        // 서브카테고리 필터 (OR) — EXISTS subquery: SubCategoryCourse → SubCategory
+        // 서브카테고리 필터 (복수, OR) — EXISTS subquery: SubCategoryCourse → SubCategory
         if (!subCategories.isNullOrEmpty()) {
             val scc = QSubCategoryCourse("scc2")
             builder.and(

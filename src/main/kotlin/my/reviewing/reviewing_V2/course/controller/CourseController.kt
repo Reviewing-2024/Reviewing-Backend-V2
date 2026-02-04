@@ -23,11 +23,11 @@ class CourseController(
     @Operation(summary = "강의 목록 조회 (필터 + 페이지네이션)")
     @GetMapping
     fun getCourses(
-        @Parameter(description = "플랫폼 영어이름 목록 (복수 선택, OR)")
-        @RequestParam(required = false) platforms: List<String>?,
+        @Parameter(description = "플랫폼 영어이름 (단일 선택)")
+        @RequestParam(required = false) platform: String?,
 
-        @Parameter(description = "카테고리 slug 목록 (복수 선택, OR)")
-        @RequestParam(required = false) categories: List<String>?,
+        @Parameter(description = "카테고리 slug (단일 선택)")
+        @RequestParam(required = false) category: String?,
 
         @Parameter(description = "서브카테고리 slug 목록 (복수 선택, OR)")
         @RequestParam(required = false) subCategories: List<String>?,
@@ -42,7 +42,7 @@ class CourseController(
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<ApiResponse<Page<CourseResponseDto>>> {
         return ResponseEntity.ok().body(
-            courseService.getCourses(platforms, categories, subCategories, sort, page, size)
+            courseService.getCourses(platform, category, subCategories, sort, page, size)
         )
     }
 }
