@@ -2,6 +2,7 @@ plugins {
 	kotlin("jvm") version "2.2.21"
 	kotlin("plugin.spring") version "2.2.21"
 	kotlin("plugin.jpa") version "2.2.21"
+	kotlin("kapt") version "1.9.25"
 	id("org.springframework.boot") version "3.4.1"
 	id("io.spring.dependency-management") version "1.1.7"
 }
@@ -52,6 +53,13 @@ dependencies {
 	// Selenium
 	implementation("org.seleniumhq.selenium:selenium-java:4.27.0")
 
+	// Querydsl JPA
+	implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+
+	// APT(Annotation Processing Tool) - Kapt 사용
+	kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
+	kapt("jakarta.persistence:jakarta.persistence-api")
+	kapt("jakarta.annotation:jakarta.annotation-api")
 }
 
 kotlin {
