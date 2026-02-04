@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface CategoryRepository : JpaRepository<Category, Long> {
     fun findBySlugAndPlatform(slug: String, platform: Platform): Category?
+    fun findByPlatform(platform: Platform): List<Category>
 }

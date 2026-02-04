@@ -31,16 +31,27 @@ class CrawlingService(
     private val log = LoggerFactory.getLogger(CrawlingService::class.java)
 
     @Async("crawlingExecutor")
-    fun runCrawlingJobAsync(jobName: String, jobId: String) {
+    fun runCrawlingJobAsync(
+        jobName: String,
+        jobId: String,
+        additionalParams: Map<String, Long> = emptyMap()
+    ) {
         log.info("비동기 크롤링 시작 - jobName: {}, jobId: {}, thread: {}",
             jobName, jobId, Thread.currentThread().name)
 
         try {
-            val jobParameters = JobParametersBuilder()
+            val jobParametersBuilder = JobParametersBuilder()
                 .addString("jobId", jobId)
-                .toJobParameters()
 
-            val jobExecution = jobLauncher.run(jobRegistry.getJob(jobName), jobParameters)
+            // 추가 파라미터 (테스트용 제한 옵션 등)
+            additionalParams.forEach { (key, value) ->
+                jobParametersBuilder.addLong(key, value)
+            }
+
+            val jobExecution = jobLauncher.run(
+                jobRegistry.getJob(jobName),
+                jobParametersBuilder.toJobParameters()
+            )
 
             log.info("크롤링 완료 - jobId: {}, status: {}", jobId, jobExecution.status)
         } catch (e: Exception) {

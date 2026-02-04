@@ -48,26 +48,41 @@ class CrawlingController(
     }
 
     @Operation(
-        summary = "비동기 강의 크롤링 실행",
-        description = "즉시 응답 후 백그라운드에서 크롤링 진행. GET /status/{jobId}로 상태 확인"
-    )
+        summary = "비동기 강의 크롤링 실행")
     @PostMapping("/courses")
     fun crawlingCourses(
         @RequestParam jobName: String,
-    ): ResponseEntity<ApiResponse<Map<String, String>>> {
+        @RequestParam(required = false) jobId: String?,
+        @RequestParam(defaultValue = "0") maxCategories: Int,
+        @RequestParam(defaultValue = "0") maxSubCategories: Int,
+        @RequestParam(defaultValue = "0") maxPages: Int
+    ): ResponseEntity<ApiResponse<Map<String, Any>>> {
 
-        val id = "${jobName}-${LocalDateTime.now()}"
+        val id = jobId ?: "${jobName}-${LocalDateTime.now()}"
 
-        crawlingService.runCrawlingJobAsync(jobName, id)
-
-        return ResponseEntity.ok().body(
-            ApiResponse.ok(
-                mapOf(
-                    "jobId" to id,
-                    "message" to "크롤링 시작"
-                )
-            )
+        val additionalParams = mapOf(
+            "maxCategories" to maxCategories.toLong(),
+            "maxSubCategories" to maxSubCategories.toLong(),
+            "maxPages" to maxPages.toLong()
         )
+
+        crawlingService.runCrawlingJobAsync(jobName, id, additionalParams)
+
+        val response = mutableMapOf<String, Any>(
+            "jobId" to id,
+            "message" to "크롤링 시작"
+        )
+
+        if (maxCategories > 0 || maxSubCategories > 0 || maxPages > 0) {
+            response["testMode"] = true
+            response["limits"] = mapOf(
+                "maxCategories" to if (maxCategories > 0) maxCategories else "무제한",
+                "maxSubCategories" to if (maxSubCategories > 0) maxSubCategories else "무제한",
+                "maxPages" to if (maxPages > 0) maxPages else "무제한"
+            )
+        }
+
+        return ResponseEntity.ok().body(ApiResponse.ok(response))
     }
 
     @Operation(
