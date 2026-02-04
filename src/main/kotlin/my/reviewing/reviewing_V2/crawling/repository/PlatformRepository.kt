@@ -7,4 +7,6 @@ interface PlatformRepository : JpaRepository<Platform, Long> {
 
     fun findByKoreanName(koreanName: String): Platform?
 
+    fun findByEnglishName(englishName: String): Platform?
+
 }
