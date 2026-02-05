@@ -1,7 +1,6 @@
 package my.reviewing.reviewing_V2.course.service
 
 import my.reviewing.reviewing_V2.course.dto.CategoryResponseDto
-import my.reviewing.reviewing_V2.crawling.entity.Category
 import my.reviewing.reviewing_V2.crawling.repository.CategoryRepository
 import my.reviewing.reviewing_V2.crawling.repository.PlatformRepository
 import my.reviewing.reviewing_V2.crawling.repository.SubCategoryRepository
@@ -32,10 +31,15 @@ class CategoryService(
         })
     }
 
-    fun getSubCategoriesByCategory(categorySlug: String): ApiResponse<List<CategoryResponseDto>> {
-        val category = categoryRepository.findBySlug(categorySlug)
+    fun getSubCategoriesByCategory(
+        platformName: String,
+        categorySlug: String
+    ): ApiResponse<List<CategoryResponseDto>> {
 
-        val subCategories = subCategoryRepository.findByCategory(category)
+        val subCategories = subCategoryRepository.findByCategorySlugAndCategoryPlatformEnglishName(
+            categorySlug,
+            platformName
+        )
 
         return ApiResponse.ok(subCategories.map { subCategory ->
             CategoryResponseDto(

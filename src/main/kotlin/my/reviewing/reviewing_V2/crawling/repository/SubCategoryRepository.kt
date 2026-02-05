@@ -7,4 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface SubCategoryRepository : JpaRepository<SubCategory, Long> {
     fun findBySlugAndCategoryId(slug: String, categoryId: Long): SubCategory?
     fun findByCategory(category: Category): List<SubCategory>
+    fun findByCategorySlugAndCategoryPlatformEnglishName(
+        categorySlug: String,
+        platformName: String
+    ): List<SubCategory>
+
 }
