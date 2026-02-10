@@ -28,7 +28,7 @@ class CustomSuccessHandler(
         val refreshToken = jwtUtil.createRefreshToken(userId)
 
         response.addCookie(createCookie("refresh", refreshToken))
-        response.sendRedirect("http://localhost:3000/login/redirect")
+        response.sendRedirect("http://localhost:5173/login/redirect")
 
     }
 
