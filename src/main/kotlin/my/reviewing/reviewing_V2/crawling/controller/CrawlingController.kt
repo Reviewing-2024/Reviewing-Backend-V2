@@ -8,6 +8,7 @@ import my.reviewing.reviewing_V2.global.api.ApiResponse
 import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -38,12 +39,14 @@ class CrawlingController(
     }
 
     @Operation(
-        summary = "인프런 카테고리 생성",
-        description = "inflearn_categories.json 파일을 읽어 Category, SubCategory 테이블에 저장"
+        summary = "카테고리 생성",
+        description = "Category, SubCategory 테이블에 저장. JSON 파일: category/{platformEnglishName}_categories.json"
     )
-    @PostMapping("/categories/inflearn")
-    fun createInflearnCategory(): ResponseEntity<ApiResponse<Map<String, Int>>> {
-        val result = crawlingService.createInflearnCategories()
+    @PostMapping("/categories/{platformEnglishName}")
+    fun createCategories(
+        @PathVariable platformEnglishName: String
+    ): ResponseEntity<ApiResponse<Map<String, Int>>> {
+        val result = crawlingService.createCategories(platformEnglishName)
         return ResponseEntity.ok().body(ApiResponse.ok(result))
     }
 
@@ -89,7 +92,7 @@ class CrawlingController(
         summary = "크롤링 상태 조회",
         description = "jobId로 크롤링 진행 상태 확인"
     )
-    @GetMapping("/status")
+    @GetMapping("/courses/status")
     fun getCrawlingStatus(
         @RequestParam jobId: String,
         @RequestParam jobName: String

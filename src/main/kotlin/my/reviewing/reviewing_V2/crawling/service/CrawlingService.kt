@@ -71,11 +71,11 @@ class CrawlingService(
     }
 
     @Transactional
-    fun createInflearnCategories(): Map<String, Int> {
-        val platform = platformRepository.findByKoreanName("인프런")
-            ?: throw BusinessException(ErrorCode.NOT_FOUND, "인프런 플랫폼이 존재하지 않습니다. 먼저 플랫폼을 생성해주세요.")
+    fun createCategories(platformEnglishName: String): Map<String, Int> {
+        val platform = platformRepository.findByEnglishName(platformEnglishName)
+            ?: throw BusinessException(ErrorCode.NOT_FOUND, "플랫폼을 찾을 수 없습니다: $platformEnglishName")
 
-        val resource = ClassPathResource("category/inflearn_categories.json")
+        val resource = ClassPathResource("category/${platformEnglishName.lowercase()}_categories.json")
         val jsonNode = objectMapper.readTree(resource.inputStream)
 
         var categoryCount = 0
@@ -85,7 +85,6 @@ class CrawlingService(
             val categorySlug = categoryNode.get("slug").asText()
             val categoryTitle = categoryNode.get("title").asText()
 
-            // 중복 체크 후 Category 저장
             val existingCategory = categoryRepository.findBySlugAndPlatform(categorySlug, platform)
             val category = existingCategory ?: run {
                 categoryCount++
@@ -98,7 +97,6 @@ class CrawlingService(
                 )
             }
 
-            // children (SubCategory) 저장
             categoryNode.get("children")?.forEach { childNode ->
                 val subSlug = childNode.get("slug").asText()
                 val subTitle = childNode.get("title").asText()

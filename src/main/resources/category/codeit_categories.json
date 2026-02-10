@@ -1,0 +1,78 @@
+[
+  {
+    "slug": "basic",
+    "title": "코딩 기초",
+    "children": [
+      { "slug": "basic", "title": "코딩 기초" }
+    ]
+  },
+  {
+    "slug": "data",
+    "title": "데이터 분석",
+    "children": [
+      { "slug": "DATA_ANALYSIS", "title": "데이터 분석" },
+      { "slug": "DATABASE", "title": "데이터베이스" },
+      { "slug": "BUSINESS_MARKETING", "title": "비즈니스/마케팅" },
+      { "slug": "data-engineering", "title": "데이터 엔지니어링" }
+    ]
+  },
+  {
+    "slug": "knowledge",
+    "title": "생성형 AI 활용",
+    "children": [
+      { "slug": "knowledge", "title": "생성형 AI 활용" }
+    ]
+  },
+  {
+    "slug": "web",
+    "title": "웹 개발",
+    "children": [
+      { "slug": "FRONTEND", "title": "프론트엔드" },
+      { "slug": "BACKEND", "title": "백엔드" },
+      { "slug": "FULLSTACK", "title": "풀스택" }
+    ]
+  },
+  {
+    "slug": "design",
+    "title": "디자인",
+    "children": [
+      { "slug": "design", "title": "디자인" }
+    ]
+  },
+  {
+    "slug": "programming",
+    "title": "프로그래밍 언어",
+    "children": [
+      { "slug": "PYTHON", "title": "Python" },
+      { "slug": "JAVASCRIPT", "title": "Javascript" },
+      { "slug": "OOP", "title": "객체 지향 프로그래밍" },
+      { "slug": "1", "title": "Java" }
+    ]
+  },
+  {
+    "slug": "ai",
+    "title": "머신러닝/딥러닝",
+    "children": [
+      { "slug": "ai", "title": "머신러닝/딥러닝" }
+    ]
+  },
+  {
+    "slug": "business",
+    "title": "IT 실무/비즈니스",
+    "children": [
+      { "slug": "IT", "title": "IT 교양" },
+      { "slug": "BUSINESS_MARKETING", "title": "비즈니스/마케팅" },
+      { "slug": "AUTOMATION", "title": "업무 자동화" },
+      { "slug": "DATABASE", "title": "데이터베이스" }
+    ]
+  },
+  {
+    "slug": "computer",
+    "title": "개발 도구/컴퓨터 과학",
+    "children": [
+      { "slug": "ALGORITHM", "title": "알고리즘·자료구조" },
+      { "slug": "OOP", "title": "객체 지향 프로그래밍" },
+      { "slug": "PROGRAMMING_TOOL", "title": "개발 도구" }
+    ]
+  }
+]
