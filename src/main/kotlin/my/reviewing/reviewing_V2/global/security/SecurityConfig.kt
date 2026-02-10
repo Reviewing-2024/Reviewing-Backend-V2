@@ -28,7 +28,7 @@ class SecurityConfig(
         http.cors {
             it.configurationSource { _: HttpServletRequest ->
                 CorsConfiguration().apply {
-                    allowedOrigins = listOf("http://localhost:3000")
+                    allowedOrigins = listOf("http://localhost:5173")
                     allowedMethods = listOf("*")
                     allowedHeaders = listOf("*")
                     allowCredentials = true
