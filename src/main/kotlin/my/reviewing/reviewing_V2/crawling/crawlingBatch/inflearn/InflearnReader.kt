@@ -1,5 +1,6 @@
 package my.reviewing.reviewing_V2.crawling.crawlingBatch.inflearn
 
+import my.reviewing.reviewing_V2.crawling.crawlingBatch.dto.CrawlingCourseDto
 import my.reviewing.reviewing_V2.crawling.entity.Category
 import my.reviewing.reviewing_V2.crawling.entity.Platform
 import my.reviewing.reviewing_V2.crawling.entity.SubCategory
@@ -37,7 +38,7 @@ class InflearnReader(
     private val maxCategories: Int = 0,
     private val maxSubCategoriesPerCategory: Int = 0,
     private val maxPagesPerSubCategory: Int = 0
-) : ItemStreamReader<InflearnCrawlingDto> {
+) : ItemStreamReader<CrawlingCourseDto> {
 
     private val log = LoggerFactory.getLogger(InflearnReader::class.java)
 
@@ -74,7 +75,7 @@ class InflearnReader(
     private var lastPage = 1
 
     // 현재 페이지의 강의 목록
-    private var courseBuffer: MutableList<InflearnCrawlingDto> = mutableListOf()
+    private var courseBuffer: MutableList<CrawlingCourseDto> = mutableListOf()
 
     override fun open(executionContext: ExecutionContext) {
         log.info("인프런 크롤링 시작")
@@ -213,7 +214,7 @@ class InflearnReader(
         }
     }
 
-    override fun read(): InflearnCrawlingDto? {
+    override fun read(): CrawlingCourseDto? {
         // 1. 버퍼에 데이터가 있으면 반환
         if (courseBuffer.isNotEmpty()) {
             return courseBuffer.removeAt(0)
@@ -470,7 +471,7 @@ class InflearnReader(
         }
     }
 
-    private fun parseCourseElement(element: WebElement, subCategory: SubCategory): InflearnCrawlingDto? {
+    private fun parseCourseElement(element: WebElement, subCategory: SubCategory): CrawlingCourseDto? {
         // 링크 찾기
         val links = element.findElements(By.tagName("a"))
         if (links.isEmpty()) {
@@ -531,7 +532,7 @@ class InflearnReader(
             "Unknown"
         }
 
-        return InflearnCrawlingDto(
+        return CrawlingCourseDto(
             platform = platform,
             subCategory = subCategory,
             title = title,

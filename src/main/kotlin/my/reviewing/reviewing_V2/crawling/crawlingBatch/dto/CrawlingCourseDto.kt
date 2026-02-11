@@ -1,14 +1,15 @@
-package my.reviewing.reviewing_V2.crawling.crawlingBatch.inflearn
+package my.reviewing.reviewing_V2.crawling.crawlingBatch.dto
 
 import my.reviewing.reviewing_V2.crawling.entity.Platform
 import my.reviewing.reviewing_V2.crawling.entity.SubCategory
 
 /**
- * 인프런 크롤링 시 사용하는 DTO
+ * 강의 크롤링 공통 DTO
+ * - 인프런, 코드잇 등 여러 플랫폼에서 재사용
  * - Reader에서 크롤링한 데이터를 담음
  * - Processor에서 Course 엔티티로 변환 + SubCategoryCourse 매핑
  */
-data class InflearnCrawlingDto(
+data class CrawlingCourseDto(
     val platform: Platform,
     val subCategory: SubCategory,
     val title: String,

@@ -1,4 +1,4 @@
-package my.reviewing.reviewing_V2.crawling.crawlingBatch.inflearn
+package my.reviewing.reviewing_V2.crawling.crawlingBatch.codeit
 
 import my.reviewing.reviewing_V2.crawling.crawlingBatch.dto.CrawlingCourseDto
 import my.reviewing.reviewing_V2.crawling.entity.Course
@@ -27,7 +27,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
 
 /**
- * 인프런 크롤링 Batch 설정
+ * 코드잇 크롤링 Batch 설정
+ *
+ * CrawlingCourseDto를 그대로 재사용 (thumbnailImage/Video = null, teacher = "")
  *
  * 흐름:
  * 1. Reader: SubCategory별로 페이지네이션하며 강의 크롤링 → CrawlingCourseDto 반환
@@ -35,7 +37,7 @@ import org.springframework.transaction.PlatformTransactionManager
  * 3. Writer: Course 저장 + SubCategoryCourse 저장
  */
 @Configuration
-class InflearnCrawlingBatch(
+class CodeitCrawlingBatch(
     private val jobRepository: JobRepository,
     private val platformTransactionManager: PlatformTransactionManager,
     private val courseRepository: CourseRepository,
@@ -45,36 +47,34 @@ class InflearnCrawlingBatch(
     private val subCategoryCourseRepository: SubCategoryCourseRepository
 ) {
 
-    private val log = LoggerFactory.getLogger(InflearnCrawlingBatch::class.java)
+    private val log = LoggerFactory.getLogger(CodeitCrawlingBatch::class.java)
 
     @Bean
-    fun inflearnJob(inflearnStep: Step): Job {
-        return JobBuilder("inflearnCrawlingJob", jobRepository)
-            .start(inflearnStep)
+    fun codeitJob(codeitStep: Step): Job {
+        return JobBuilder("codeitCrawlingJob", jobRepository)
+            .start(codeitStep)
             .build()
     }
 
     @Bean
-    fun inflearnStep(inflearnReader: ItemStreamReader<CrawlingCourseDto>): Step {
-        return StepBuilder("inflearnCrawlingStep", jobRepository)
+    fun codeitStep(codeitReader: ItemStreamReader<CrawlingCourseDto>): Step {
+        return StepBuilder("codeitCrawlingStep", jobRepository)
             .chunk<CrawlingCourseDto, SubCategoryCourse>(20, platformTransactionManager)
-            .reader(inflearnReader)
-            .processor(inflearnProcessor())
-            .writer(inflearnWriter())
+            .reader(codeitReader)
+            .processor(codeitProcessor())
+            .writer(codeitWriter())
             .faultTolerant()
-            .retryLimit(5)
+            .retryLimit(3)
             .retry(ItemStreamException::class.java)
             .retry(NoSuchElementException::class.java)
             .retry(TimeoutException::class.java)
-            .skipLimit(100)
-            .skip(ItemStreamException::class.java)
-            .skip(NoSuchElementException::class.java)
-            .skip(TimeoutException::class.java)
+            .skipLimit(200)
+            .skip(Exception::class.java)
             .build()
     }
 
     /**
-     * 인프런 Reader (테스트용 제한 옵션 지원)
+     * 코드잇 Reader (테스트용 제한 옵션 지원)
      *
      * JobParameters:
      * - maxCategories: 최대 카테고리 수 (기본값 0 = 무제한)
@@ -83,12 +83,12 @@ class InflearnCrawlingBatch(
      */
     @Bean
     @StepScope
-    fun inflearnReader(
+    fun codeitReader(
         @Value("#{jobParameters['maxCategories'] ?: 0}") maxCategories: Long,
         @Value("#{jobParameters['maxSubCategories'] ?: 0}") maxSubCategories: Long,
         @Value("#{jobParameters['maxPages'] ?: 0}") maxPages: Long
     ): ItemStreamReader<CrawlingCourseDto> {
-        return InflearnReader(
+        return CodeitReader(
             platformRepository = platformRepository,
             categoryRepository = categoryRepository,
             subCategoryRepository = subCategoryRepository,
@@ -99,14 +99,12 @@ class InflearnCrawlingBatch(
     }
 
     @Bean
-    fun inflearnProcessor(): ItemProcessor<CrawlingCourseDto, SubCategoryCourse> {
+    fun codeitProcessor(): ItemProcessor<CrawlingCourseDto, SubCategoryCourse> {
         return ItemProcessor { dto ->
-            // 1. 기존 강의 조회
             val existingCourse = courseRepository.findByPlatformAndSlug(dto.platform, dto.courseSlug)
 
             val course: Course
             if (existingCourse != null) {
-                // 강의가 이미 존재
                 course = existingCourse
 
                 // SubCategoryCourse 매핑이 있는지 확인
@@ -114,26 +112,21 @@ class InflearnCrawlingBatch(
                     course, dto.subCategory
                 )
                 if (existingMapping != null) {
-//                    log.debug("이미 존재하는 강의+매핑, 건너뛰기: {}", dto.title)
                     return@ItemProcessor null
                 }
-
-//                log.debug("기존 강의에 카테고리 매핑 추가: {} → {}", dto.title, dto.subCategory.name)
             } else {
-                // 새 강의 생성
+                // 새 강의 생성 (코드잇 특성상 thumbnailImage/Video = null, teacher = null)
                 course = Course(
                     platform = dto.platform,
                     title = dto.title,
                     url = dto.courseUrl,
                     slug = dto.courseSlug,
-                    thumbnailImage = dto.thumbnailImage,
-                    thumbnailVideo = dto.thumbnailVideo,
-                    teacher = dto.teacher
+                    thumbnailImage = null,
+                    thumbnailVideo = null,
+                    teacher = dto.teacher.ifEmpty { null }
                 )
-//                log.debug("새 강의 저장 대상: {}", dto.title)
             }
 
-            // SubCategoryCourse 반환 (Writer에서 저장)
             SubCategoryCourse(
                 course = course,
                 subCategory = dto.subCategory
@@ -142,19 +135,16 @@ class InflearnCrawlingBatch(
     }
 
     @Bean
-    fun inflearnWriter(): ItemWriter<SubCategoryCourse> {
+    fun codeitWriter(): ItemWriter<SubCategoryCourse> {
         return ItemWriter { items ->
             var newCourseCount = 0
             var newMappingCount = 0
 
             for (item in items) {
-                // Course가 새로 생성된 경우 저장
                 if (item.course.id == null) {
                     courseRepository.save(item.course)
                     newCourseCount++
                 }
-
-                // SubCategoryCourse 저장
                 subCategoryCourseRepository.save(item)
                 newMappingCount++
             }
