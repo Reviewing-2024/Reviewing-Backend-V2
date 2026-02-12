@@ -1,4 +1,4 @@
-package my.reviewing.reviewing_V2.crawling.crawlingBatch.dto
+package my.reviewing.reviewing_V2.crawling.dto
 
 import my.reviewing.reviewing_V2.crawling.entity.Platform
 import my.reviewing.reviewing_V2.crawling.entity.SubCategory

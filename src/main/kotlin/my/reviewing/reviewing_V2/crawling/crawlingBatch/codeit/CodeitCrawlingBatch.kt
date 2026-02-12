@@ -1,6 +1,6 @@
 package my.reviewing.reviewing_V2.crawling.crawlingBatch.codeit
 
-import my.reviewing.reviewing_V2.crawling.crawlingBatch.dto.CrawlingCourseDto
+import my.reviewing.reviewing_V2.crawling.dto.CrawlingCourseDto
 import my.reviewing.reviewing_V2.crawling.entity.Course
 import my.reviewing.reviewing_V2.crawling.entity.SubCategoryCourse
 import my.reviewing.reviewing_V2.crawling.repository.CategoryRepository

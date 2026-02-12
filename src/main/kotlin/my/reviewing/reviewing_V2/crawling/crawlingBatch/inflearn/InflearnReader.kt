@@ -1,6 +1,6 @@
 package my.reviewing.reviewing_V2.crawling.crawlingBatch.inflearn
 
-import my.reviewing.reviewing_V2.crawling.crawlingBatch.dto.CrawlingCourseDto
+import my.reviewing.reviewing_V2.crawling.dto.CrawlingCourseDto
 import my.reviewing.reviewing_V2.crawling.entity.Category
 import my.reviewing.reviewing_V2.crawling.entity.Platform
 import my.reviewing.reviewing_V2.crawling.entity.SubCategory
@@ -14,7 +14,6 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
 import org.springframework.batch.item.ExecutionContext
