@@ -9,6 +9,8 @@ import my.reviewing.reviewing_V2.crawling.entity.QCourse
 import my.reviewing.reviewing_V2.crawling.entity.QSubCategoryCourse
 import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.global.api.ApiResponse
+import my.reviewing.reviewing_V2.global.error.BusinessException
+import my.reviewing.reviewing_V2.global.error.ErrorCode
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -88,4 +90,29 @@ class CourseService(
             )
         })
     }
+
+    fun getCourse(platform: String, slug: String): ApiResponse<CourseResponseDto> {
+
+        val findCourse = courseRepository.findByPlatformEnglishNameAndSlug(platform,slug)
+            ?: throw BusinessException(ErrorCode.NOT_FOUND, "강의가 존재하지 않습니다.")
+
+        return ApiResponse.ok(
+            CourseResponseDto(
+                id = findCourse.id!!,
+                slug = findCourse.slug,
+                title = findCourse.title,
+                teacher = findCourse.teacher ?: "",
+                thumbnailImage = findCourse.thumbnailImage,
+                thumbnailVideo = findCourse.thumbnailVideo,
+                url = findCourse.url,
+                rating = findCourse.rating,
+                wishes = findCourse.wishes,
+                comments = findCourse.comments,
+                platform = findCourse.platform.englishName
+            )
+        )
+
+    }
+
+
 }

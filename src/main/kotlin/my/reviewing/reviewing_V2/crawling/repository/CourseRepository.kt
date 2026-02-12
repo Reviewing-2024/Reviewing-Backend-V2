@@ -10,4 +10,6 @@ interface CourseRepository : JpaRepository<Course, UUID>, QuerydslPredicateExecu
 
     fun findByPlatformAndSlug(platform: Platform, slug: String): Course?
 
+    fun findByPlatformEnglishNameAndSlug(platform: String, slug: String): Course?
+
 }
