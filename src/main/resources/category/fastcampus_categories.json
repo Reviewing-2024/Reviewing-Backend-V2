@@ -1,0 +1,99 @@
+[
+  {
+    "slug": "category_online_datasciencedl",
+    "title": "AI TECH",
+    "children": [
+      { "slug": "category_online_datasciencenlp", "title": "LLM" },
+      { "slug": "category_online_aitechrag", "title": "RAG & AI Agent" },
+      { "slug": "category_online_datasciencedeep", "title": "딥러닝/머신러닝" },
+      { "slug": "category_online_aitechrobot", "title": "자율주행/로봇" },
+      { "slug": "category_online_datasciencecv", "title": "컴퓨터 비전" }
+    ]
+  },
+  {
+    "slug": "category_online_aicreative",
+    "title": "AI CREATIVE",
+    "children": [
+      { "slug": "category_online_aicreativeimg", "title": "2D/3D 이미지 생성" },
+      { "slug": "category_online_aicreativevideo", "title": "영상 생성" }
+    ]
+  },
+  {
+    "slug": "category_online_biz",
+    "title": "AI/업무생산성",
+    "children": [
+      { "slug": "category_online_bizchatgpt", "title": "AI 생산성" },
+      { "slug": "category_online_marketing", "title": "마케팅" },
+      { "slug": "category_online_bizexcel", "title": "엑셀/피피티/보고서" },
+      { "slug": "category_online_datascienceanal", "title": "데이터분석" }
+    ]
+  },
+  {
+    "slug": "category_online_programming",
+    "title": "개발/데이터",
+    "children": [
+      { "slug": "category_online_programmingback", "title": "백엔드 개발" },
+      { "slug": "category_online_programmingfront", "title": "프론트엔드 개발" },
+      { "slug": "category_online_programmingdevops", "title": "DevOps/Infra" },
+      { "slug": "category_online_programmingapp", "title": "모바일 앱 개발" },
+      { "slug": "category_online_programmingcareer", "title": "컴퓨터 공학/SW 엔지니어링" },
+      { "slug": "category_online_programmingblockchain", "title": "블록체인 개발" },
+      { "slug": "category_online_programminggame", "title": "게임 개발" },
+      { "slug": "category_online_semiconductor", "title": "반도체" },
+      { "slug": "category_online_datascienceeng", "title": "데이터 엔지니어링" }
+    ]
+  },
+  {
+    "slug": "category_online_dgn",
+    "title": "디자인",
+    "children": [
+      { "slug": "category_online_plusx", "title": "SHARE X" },
+      { "slug": "category_online_dgnuxui", "title": "UX/UI/BX" },
+      { "slug": "category_online_dgnvisual", "title": "그래픽/타이포/브랜딩" }
+    ]
+  },
+  {
+    "slug": "category_online_video",
+    "title": "영상/3D",
+    "children": [
+      { "slug": "category_online_videogame", "title": "블렌더" },
+      { "slug": "category_online_videovirtual", "title": "버튜버" },
+      { "slug": "category_online_dgn3d", "title": "3D" },
+      { "slug": "category_online_videoedit", "title": "영상/사진" },
+      { "slug": "category_online_videomotion", "title": "모션그래픽" },
+      { "slug": "category_online_videovfx", "title": "CG VFX" }
+    ]
+  },
+  {
+    "slug": "category_online_finance",
+    "title": "금융/투자",
+    "children": [
+      { "slug": "category_online_kfa", "title": "권오상 금융아카데미" },
+      { "slug": "category_online_financerealestate", "title": "부동산" },
+      { "slug": "category_online_financeaccounting", "title": "재무/회계/세무" },
+      { "slug": "category_online_financeinvest", "title": "금융 투자 실무" },
+      { "slug": "category_online_invest", "title": "재테크/주식" }
+    ]
+  },
+  {
+    "slug": "category_online_illust",
+    "title": "드로잉/일러스트",
+    "children": [
+      { "slug": "category_online_illustcha", "title": "캐릭터일러스트" },
+      { "slug": "category_online_illustweb", "title": "웹툰/웹소설" },
+      { "slug": "category_online_illustart", "title": "원화/컨셉아트" },
+      { "slug": "category_online_illusthobby", "title": "드로잉/이모티콘" }
+    ]
+  },
+  {
+    "slug": "category_online_bizplanning",
+    "title": "비즈니스/기획",
+    "children": [
+      { "slug": "category_online_bizcom", "title": "PM/PO" },
+      { "slug": "category_online_entrepreneurship", "title": "부업/창업" },
+      { "slug": "category_online_bizmanagement", "title": "기획/경영/리더십" },
+      { "slug": "category_online_bizleadership", "title": "커뮤니케이션/외국어" },
+      { "slug": "category_online_marketingwriting", "title": "글쓰기" }
+    ]
+  }
+]
