@@ -14,7 +14,6 @@ import my.reviewing.reviewing_V2.global.api.ApiResponse
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.global.jwt.JWTUtil
-import my.reviewing.reviewing_V2.member.dto.MemberResponseDto
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
@@ -90,7 +89,7 @@ class AuthController(
         ]
     )
     @PostMapping("/access")
-    fun issueAccessToken(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<ApiResponse<MemberResponseDto>> {
+    fun issueAccessToken(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<ApiResponse<Map<String, String>>> {
         // 1. 쿠키에서 refresh token 가져오기 (무조건 있어야 함)
         val refreshToken = request.cookies
             ?.firstOrNull { it.name == "refresh" }
@@ -123,10 +122,7 @@ class AuthController(
         val accessToken = jwtUtil.createAccessToken(userId, member.role)
         response.setHeader("Authorization", "Bearer $accessToken")
 
-        return ResponseEntity.ok().body(ApiResponse.ok(MemberResponseDto(
-            id = member.id!!,
-            name = member.name
-        )))
+        return ResponseEntity.ok().body(ApiResponse.ok(mapOf("name" to member.name)))
     }
 
     @Operation(
