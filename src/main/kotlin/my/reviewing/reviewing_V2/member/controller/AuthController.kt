@@ -15,6 +15,7 @@ import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.global.jwt.JWTUtil
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
+import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -107,6 +108,8 @@ class AuthController(
             }
         } catch (e: BusinessException) {
             throw e
+        } catch (e: ExpiredJwtException) {
+            throw BusinessException(ErrorCode.EXPIRED_REFRESH)
         } catch (e: Exception) {
             logger.error("JWT validation failed: ${e.javaClass.simpleName} - ${e.message}")
             throw BusinessException(ErrorCode.INVALID_REFRESH)
@@ -203,6 +206,8 @@ class AuthController(
             }
         } catch (e: BusinessException) {
             throw e
+        } catch (e: ExpiredJwtException) {
+            throw BusinessException(ErrorCode.EXPIRED_REFRESH)
         } catch (e: Exception) {
             logger.error("JWT validation failed: ${e.javaClass.simpleName} - ${e.message}")
             throw BusinessException(ErrorCode.INVALID_REFRESH)

@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.jsonwebtoken.ExpiredJwtException
 
 @Component
 class JWTFilter(
@@ -40,18 +41,15 @@ class JWTFilter(
         }
 
         try {
-            if (jwtUtil.isExpired(accessToken)) {
-                writeErrorResponse(response, objectMapper, ErrorCode.EXPIRED_ACCESS) // refresh 시도
-                return
-            }
+            val claims = jwtUtil.getClaims(accessToken) // 1번만 파싱 (만료 시 ExpiredJwtException)
 
-            if (jwtUtil.getCategory(accessToken) != "access") {
+            if (claims["category"] != "access") {
                 writeErrorResponse(response, objectMapper, ErrorCode.UNAUTHORIZED) // 로그인 시도
                 return
             }
 
-            val userId = jwtUtil.getUserId(accessToken)
-            val role = jwtUtil.getRole(accessToken)
+            val userId = claims.get("userId", java.lang.Long::class.java).toLong()
+            val role = claims.get("role", String::class.java)
 
             val authorities = listOf(GrantedAuthority { role })
             val auth = UsernamePasswordAuthenticationToken(userId, null, authorities)
@@ -59,6 +57,9 @@ class JWTFilter(
 
             filterChain.doFilter(request, response)
 
+        } catch (e: ExpiredJwtException) {
+            writeErrorResponse(response, objectMapper, ErrorCode.EXPIRED_ACCESS) // refresh 시도
+            return
         } catch (e: Exception) {
             writeErrorResponse(response, objectMapper, ErrorCode.INVALID_ACCESS) // 로그아웃 + 재로그인 유도
             return

@@ -1,5 +1,6 @@
 package my.reviewing.reviewing_V2.global.jwt
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
@@ -15,6 +16,15 @@ class JWTUtil(
     private val secretKey: SecretKey = Keys.hmacShaKeyFor(
         Decoders.BASE64.decode(secret)
     )
+
+    // 토큰을 한 번만 파싱해서 Claims 반환 (만료 시 ExpiredJwtException throw)
+    fun getClaims(token: String): Claims {
+        return Jwts.parser()
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(token)
+            .payload
+    }
 
     fun getUserId(token: String): Long {
         return Jwts.parser()
