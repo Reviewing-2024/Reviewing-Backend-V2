@@ -9,6 +9,7 @@ enum class ErrorCode(
 ) {
 
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_400_VALIDATION_ERROR", "요청 값이 올바르지 않습니다."),
+    CONFLICT(HttpStatus.CONFLICT, "COMMON_409_CONFLICT", "이미 존재합니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_401_UNAUTHORIZED", "로그인이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH_403_FORBIDDEN", "권한이 없습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON_404_NOT_FOUND", "대상을 찾을 수 없습니다."),

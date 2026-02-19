@@ -4,9 +4,13 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import my.reviewing.reviewing_V2.global.api.ApiResponse
+import my.reviewing.reviewing_V2.global.error.BusinessException
+import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -27,6 +31,21 @@ class MemberController(
         val body = ApiResponse.ok("hello world")
 
         return ResponseEntity.ok().body(body)
+    }
+
+    // TODO: 임시 API - 프로덕션 배포 전 삭제
+    @Operation(
+        summary = "[임시] 관리자 권한 부여",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @PatchMapping("/{id}/role/admin")
+    fun grantAdmin(@PathVariable id: Long): ResponseEntity<ApiResponse<Unit>> {
+        val member = memberRepository.findById(id).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        }
+        member.role = "ROLE_ADMIN"
+        memberRepository.save(member)
+        return ResponseEntity.ok(ApiResponse.ok())
     }
 
 }
