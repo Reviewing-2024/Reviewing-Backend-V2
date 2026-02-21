@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "members")
@@ -25,9 +25,9 @@ class Member(
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime? = null
+    var createdAt: Instant? = null
 
     @LastModifiedDate
     @Column(nullable = false)
-    var updatedAt: LocalDateTime? = null
+    var updatedAt: Instant? = null
 }

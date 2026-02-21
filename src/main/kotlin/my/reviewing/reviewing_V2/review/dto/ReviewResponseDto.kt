@@ -2,7 +2,7 @@ package my.reviewing.reviewing_V2.review.dto
 
 import my.reviewing.reviewing_V2.review.entity.Review
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.Instant
 
 data class ReviewResponseDto(
     val id: Long,
@@ -11,7 +11,7 @@ data class ReviewResponseDto(
     val rating: BigDecimal,
     val likes: Int,
     val dislikes: Int,
-    val createdAt: LocalDateTime
+    val createdAt: Instant
 ) {
     companion object {
         fun from(review: Review) = ReviewResponseDto(

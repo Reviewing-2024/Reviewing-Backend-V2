@@ -17,7 +17,8 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.Instant
+
 
 @Entity
 @Table(name = "reviews")
@@ -43,7 +44,7 @@ class Review(
 
     var dislikes: Int = 0,
 
-    var deletedAt: LocalDateTime? = null,
+    var deletedAt: Instant? = null,
 
     @Enumerated(EnumType.STRING)
     var state: ReviewStateType = ReviewStateType.PENDING,
@@ -58,10 +59,10 @@ class Review(
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime? = null
+    var createdAt: Instant? = null
 
     @LastModifiedDate
     @Column(nullable = false)
-    var updatedAt: LocalDateTime? = null
+    var updatedAt: Instant? = null
 
 }
