@@ -2,6 +2,9 @@ package my.reviewing.reviewing_V2.admin.service
 
 import my.reviewing.reviewing_V2.admin.dto.AdminReviewListResponseDto
 import my.reviewing.reviewing_V2.admin.dto.AdminReviewResponseDto
+import my.reviewing.reviewing_V2.admin.dto.ReviewRejectRequestDto
+import my.reviewing.reviewing_V2.global.error.BusinessException
+import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.review.entity.Review
 import my.reviewing.reviewing_V2.review.entity.ReviewStateType
 import my.reviewing.reviewing_V2.review.repository.ReviewRepository
@@ -26,6 +29,23 @@ class AdminService(
             .map { review: Review -> AdminReviewResponseDto.from(review) }
         val pendingCount = reviewRepository.countByState(ReviewStateType.PENDING)
         return AdminReviewListResponseDto(reviews = reviews, pendingCount = pendingCount)
+    }
+
+    @Transactional
+    fun changeReviewApprove(reviewId: Long) {
+        val review = reviewRepository.findById(reviewId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "리뷰가 없습니다.")
+        }
+        review.state = ReviewStateType.APPROVED
+    }
+
+    @Transactional
+    fun changeReviewReject(reviewId: Long, reviewRejectRequestDto: ReviewRejectRequestDto) {
+        val review = reviewRepository.findById(reviewId).orElseThrow{
+            BusinessException(ErrorCode.NOT_FOUND, "리뷰가 없습니다.")
+        }
+        review.state = ReviewStateType.REJECTED
+        review.rejectionReason = reviewRejectRequestDto.rejectionReason
     }
 
 }
