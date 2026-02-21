@@ -1,5 +1,7 @@
 package my.reviewing.reviewing_V2.admin.controller
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import my.reviewing.reviewing_V2.admin.dto.AdminReviewListResponseDto
 import my.reviewing.reviewing_V2.admin.dto.ReviewRejectRequestDto
@@ -22,6 +24,10 @@ class AdminController(
     private val adminService: AdminService
 ) {
 
+    @Operation(
+        summary = "관리자 리뷰 조회",
+        security = [SecurityRequirement(name = "JWT")]
+    )
     @GetMapping("/reviews")
     fun findReviewsByState(
         @RequestParam(defaultValue = "PENDING") state: ReviewStateType,
@@ -32,12 +38,20 @@ class AdminController(
         return ResponseEntity.ok().body(ApiResponse.ok(reviews))
     }
 
+    @Operation(
+        summary = "관리자 리뷰 승인",
+        security = [SecurityRequirement(name = "JWT")]
+    )
     @PatchMapping("/reviews/{reviewId}/approve")
     fun changeReviewApprove(@PathVariable reviewId: Long): ResponseEntity<ApiResponse<Unit>> {
         adminService.changeReviewApprove(reviewId)
         return ResponseEntity.ok().body(ApiResponse.ok())
     }
 
+    @Operation(
+        summary = "관리자 리뷰 거절",
+        security = [SecurityRequirement(name = "JWT")]
+    )
     @PatchMapping("/reviews/{reviewId}/reject")
     fun changeReviewReject(
         @PathVariable reviewId: Long,
