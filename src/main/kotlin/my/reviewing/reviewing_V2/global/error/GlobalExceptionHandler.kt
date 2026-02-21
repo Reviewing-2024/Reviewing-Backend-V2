@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -45,6 +46,13 @@ class GlobalExceptionHandler {
             )
         )
         return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
+    }
+
+    // 브라우저 자동 요청 (favicon.ico, devtools 등) - 로그 무시
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoResourceFound(e: NoResourceFoundException): ResponseEntity<Unit> {
+        logger.debug("No resource found: ${e.message}")
+        return ResponseEntity.notFound().build()
     }
 
     // 500 에러 - 예상치 못한 에러
