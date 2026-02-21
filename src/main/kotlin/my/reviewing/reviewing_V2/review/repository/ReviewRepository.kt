@@ -16,4 +16,7 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     ): Boolean
 
     fun findByCourseAndState(course: Course, state: ReviewStateType, pageable: Pageable): Slice<Review>
+    fun findByState(state: ReviewStateType, pageable: Pageable): Slice<Review>
+    fun countByState(state: ReviewStateType): Long
+
 }
