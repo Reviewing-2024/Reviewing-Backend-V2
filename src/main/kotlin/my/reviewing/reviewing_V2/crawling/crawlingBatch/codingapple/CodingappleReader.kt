@@ -30,7 +30,7 @@ import java.time.Duration
  *     div.item-avatar > a[href] > img[src]   ← URL + 썸네일
  *     div.item-title > a                     ← 제목
  */
-class CodingappleReader(
+open class CodingappleReader(
     private val platformRepository: PlatformRepository
 ) : ItemStreamReader<Course> {
 

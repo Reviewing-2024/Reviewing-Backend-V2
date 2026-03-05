@@ -33,7 +33,7 @@ import java.time.Duration
  * @param maxCategories 최대 카테고리 수 (0 = 무제한)
  * @param maxSubCategoriesPerCategory 카테고리당 최대 서브카테고리 수 (0 = 무제한)
  */
-class FastcampusReader(
+open class FastcampusReader(
     private val platformRepository: PlatformRepository,
     private val categoryRepository: CategoryRepository,
     private val subCategoryRepository: SubCategoryRepository,

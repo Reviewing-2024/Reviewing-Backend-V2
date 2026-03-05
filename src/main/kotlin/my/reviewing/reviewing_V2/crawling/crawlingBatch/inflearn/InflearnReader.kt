@@ -30,7 +30,7 @@ import java.time.Duration
  * @param maxSubCategoriesPerCategory 카테고리당 최대 서브카테고리 수 (0 = 무제한)
  * @param maxPagesPerSubCategory 서브카테고리당 최대 페이지 수 (0 = 무제한)
  */
-class InflearnReader(
+open class InflearnReader(
     private val platformRepository: PlatformRepository,
     private val categoryRepository: CategoryRepository,
     private val subCategoryRepository: SubCategoryRepository,

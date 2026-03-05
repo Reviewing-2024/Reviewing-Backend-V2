@@ -57,7 +57,7 @@ class CodingappleCrawlingBatch(
     }
 
     @Bean
-    fun codingappleReader(): ItemStreamReader<Course> {
+    fun codingappleReader(): CodingappleReader {
         return CodingappleReader(platformRepository)
     }
 

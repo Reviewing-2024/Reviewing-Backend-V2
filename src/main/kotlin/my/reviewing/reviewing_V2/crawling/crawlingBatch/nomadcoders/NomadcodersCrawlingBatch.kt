@@ -52,7 +52,7 @@ class NomadcodersCrawlingBatch(
     }
 
     @Bean
-    fun nomadcodersReader(): ItemReader<Course> {
+    fun nomadcodersReader(): NomadcodersReader {
         return NomadcodersReader(platformRepository, objectMapper)
     }
 

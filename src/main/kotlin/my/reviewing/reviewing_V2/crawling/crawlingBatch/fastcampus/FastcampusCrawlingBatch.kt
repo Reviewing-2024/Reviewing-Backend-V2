@@ -79,7 +79,7 @@ class FastcampusCrawlingBatch(
     fun fastcampusReader(
         @Value("#{jobParameters['maxCategories'] ?: 0}") maxCategories: Long,
         @Value("#{jobParameters['maxSubCategories'] ?: 0}") maxSubCategories: Long
-    ): ItemStreamReader<CrawlingCourseDto> {
+    ): FastcampusReader {
         return FastcampusReader(
             platformRepository = platformRepository,
             categoryRepository = categoryRepository,

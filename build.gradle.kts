@@ -25,6 +25,16 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url = uri("https://repo.spring.io/milestone") }
+}
+
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.ai:spring-ai-bom:1.0.0-M6")
+	}
+	dependencies {
+		dependency("io.swagger.core.v3:swagger-annotations-jakarta:2.2.30")
+	}
 }
 
 dependencies {
@@ -61,6 +71,14 @@ dependencies {
 	kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
 	kapt("jakarta.persistence:jakarta.persistence-api")
 	kapt("jakarta.annotation:jakarta.annotation-api")
+
+	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter") {
+		exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
+	}
+	implementation("org.springframework.ai:spring-ai-elasticsearch-store-spring-boot-starter") {
+		exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
+	}
+	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
 }
 
 kotlin {

@@ -17,7 +17,7 @@ import org.springframework.batch.item.ItemStreamException
 import org.springframework.batch.item.ItemStreamReader
 import java.time.Duration
 
-class NomadcodersReader(
+open class NomadcodersReader(
     private val platformRepository: PlatformRepository,
     private val objectMapper: ObjectMapper
 ) : ItemStreamReader<Course> {

@@ -87,7 +87,7 @@ class InflearnCrawlingBatch(
         @Value("#{jobParameters['maxCategories'] ?: 0}") maxCategories: Long,
         @Value("#{jobParameters['maxSubCategories'] ?: 0}") maxSubCategories: Long,
         @Value("#{jobParameters['maxPages'] ?: 0}") maxPages: Long
-    ): ItemStreamReader<CrawlingCourseDto> {
+    ): InflearnReader {
         return InflearnReader(
             platformRepository = platformRepository,
             categoryRepository = categoryRepository,
