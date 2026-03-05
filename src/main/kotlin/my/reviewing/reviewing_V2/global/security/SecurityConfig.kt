@@ -66,6 +66,8 @@ class SecurityConfig(
 //                .requestMatchers("/api/auth/refresh").permitAll()
 //                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/reviews/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/v1/courses/*/wish").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/courses/*/wish").authenticated()
                 .anyRequest().permitAll()
         }
 

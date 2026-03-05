@@ -4,6 +4,8 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.JPAExpressions
 import org.springframework.transaction.annotation.Transactional
 import my.reviewing.reviewing_V2.course.dto.CourseResponseDto
+import my.reviewing.reviewing_V2.course.entity.CourseWish
+import my.reviewing.reviewing_V2.course.repository.CourseWishRepository
 import my.reviewing.reviewing_V2.crawling.entity.Course
 import my.reviewing.reviewing_V2.crawling.entity.QCourse
 import my.reviewing.reviewing_V2.crawling.entity.QSubCategoryCourse
@@ -11,14 +13,18 @@ import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.global.api.ApiResponse
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
+import my.reviewing.reviewing_V2.member.repository.MemberRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class CourseService(
-    private val courseRepository: CourseRepository
+    private val courseRepository: CourseRepository,
+    private val courseWishRepository: CourseWishRepository,
+    private val memberRepository: MemberRepository
 ) {
 
     @Transactional(readOnly = true)
@@ -28,7 +34,8 @@ class CourseService(
         subCategories: List<String>?,
         sort: String,
         page: Int,
-        size: Int
+        size: Int,
+        memberId: Long?
     ): ApiResponse<Page<CourseResponseDto>> {
         val qCourse = QCourse.course
         val builder = BooleanBuilder()
@@ -74,6 +81,30 @@ class CourseService(
 
         val coursePage = courseRepository.findAll(builder, pageable)
 
+        // 비로그인
+        if (memberId == null) {
+            return ApiResponse.ok(coursePage.map { course: Course ->
+                CourseResponseDto(
+                    id = course.id!!,
+                    slug = course.slug,
+                    title = course.title,
+                    teacher = course.teacher ?: "",
+                    thumbnailImage = course.thumbnailImage,
+                    thumbnailVideo = course.thumbnailVideo,
+                    url = course.url,
+                    rating = course.rating,
+                    wishes = course.wishes,
+                    comments = course.comments,
+                    platform = course.platform.englishName,
+                    wished = false
+                )
+            })
+        }
+
+        // 로그인
+        val courseIds = coursePage.content.map { it.id!! }
+        val wishedIds = courseWishRepository.findWishedCourseIds(courseIds, memberId).toSet()
+
         return ApiResponse.ok(coursePage.map { course: Course ->
             CourseResponseDto(
                 id = course.id!!,
@@ -86,15 +117,20 @@ class CourseService(
                 rating = course.rating,
                 wishes = course.wishes,
                 comments = course.comments,
-                platform = course.platform.englishName
+                platform = course.platform.englishName,
+                wished = wishedIds.contains((course.id))
             )
         })
     }
 
-    fun getCourse(platform: String, slug: String): ApiResponse<CourseResponseDto> {
+    fun getCourse(platform: String, slug: String, memberId: Long?): ApiResponse<CourseResponseDto> {
 
         val findCourse = courseRepository.findByPlatformEnglishNameAndSlug(platform,slug)
             ?: throw BusinessException(ErrorCode.NOT_FOUND, "강의가 존재하지 않습니다.")
+
+        val wished = if (memberId != null) {
+            courseWishRepository.existsByCourseIdAndMemberId(findCourse.id!!,memberId)
+        } else false
 
         return ApiResponse.ok(
             CourseResponseDto(
@@ -108,10 +144,35 @@ class CourseService(
                 rating = findCourse.rating,
                 wishes = findCourse.wishes,
                 comments = findCourse.comments,
-                platform = findCourse.platform.englishName
+                platform = findCourse.platform.englishName,
+                wished = wished
             )
         )
 
+    }
+
+    @Transactional
+    fun addWish(courseId: UUID, memberId: Long) {
+        if (courseWishRepository.existsByCourseIdAndMemberId(courseId, memberId)) {
+            throw BusinessException(ErrorCode.CONFLICT, "이미 찜 한 강의입니다.")
+        }
+        val course = courseRepository.findById(courseId).orElseThrow() {
+            BusinessException(ErrorCode.NOT_FOUND, "강의를 찾을 수 없습니다.")
+        }
+        val member = memberRepository.findById(memberId).orElseThrow(){
+            BusinessException(ErrorCode.NOT_FOUND)
+        }
+        courseWishRepository.save(CourseWish(course = course, member = member))
+        courseRepository.incrementWishes(courseId)
+    }
+
+    @Transactional
+    fun removeWish(courseId: UUID, memberId: Long) {
+        if (!courseWishRepository.existsByCourseIdAndMemberId(courseId, memberId)) {
+            throw BusinessException(ErrorCode.NOT_FOUND)
+        }
+        courseWishRepository.deleteByCourseIdAndMemberId(courseId,memberId)
+        courseRepository.decrementWishes(courseId)
     }
 
 

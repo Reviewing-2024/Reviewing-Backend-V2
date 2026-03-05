@@ -15,6 +15,7 @@ class CourseResponseDto(
     val rating: BigDecimal,
     val wishes: Int,
     val comments: Int,
-    val platform: String
+    val platform: String,
+    val wished: Boolean = false
 
 )
