@@ -57,6 +57,23 @@ class ReviewService(
         reviewRepository.save(review)
     }
 
+    fun checkBeforeCreateReview(courseId: UUID, memberId: Long) {
+        val course = courseRepository.findById(courseId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "강의를 찾을 수 없습니다.")
+        }
+
+        val member = memberRepository.findById(memberId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        }
+
+        if (reviewRepository.existsByMemberAndCourseAndStateIn(
+                member, course, listOf(ReviewStateType.PENDING, ReviewStateType.APPROVED)
+            )
+        ) {
+            throw BusinessException(ErrorCode.CONFLICT, "이미 리뷰를 작성하셨습니다.")
+        }
+    }
+
     @Transactional(readOnly = true)
     fun findReviewsByCourse(
         courseId: UUID,

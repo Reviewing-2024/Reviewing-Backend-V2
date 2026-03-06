@@ -81,6 +81,21 @@ class ReviewController(
     }
 
     @Operation(
+        summary = "리뷰 작성 검사",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @GetMapping("/{courseId}/check")
+    fun checkBeforeCreateReview(
+        @PathVariable courseId: UUID,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        reviewService.checkBeforeCreateReview(courseId, memberId)
+        return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+
+    @Operation(
         summary = "강의별 리뷰 조회",
         description = """
             - sort: LATEST(최신순, 기본값) / HIGH_RATING(평점 높은순) / LOW_RATING(평점 낮은순)
