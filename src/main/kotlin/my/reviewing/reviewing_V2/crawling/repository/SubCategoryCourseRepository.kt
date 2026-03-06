@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface SubCategoryCourseRepository : JpaRepository<SubCategoryCourse, Long> {
     fun findByCourseAndSubCategory(course: Course, subCategory: SubCategory): SubCategoryCourse?
+    fun findByCourse(course: Course): List<SubCategoryCourse>
 }
