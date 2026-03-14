@@ -27,4 +27,8 @@ interface CourseRepository : JpaRepository<Course, UUID>, QuerydslPredicateExecu
     @Query("UPDATE Course c SET c.comments = c.comments + 1 WHERE c.id = :courseId")
     fun incrementComments(@Param("courseId") courseId: UUID)
 
+    @Modifying
+    @Query("UPDATE Course c SET c.rating = (SELECT COALESCE(AVG(r.rating), 0) FROM Review r WHERE r.course.id = :courseId AND r.state = 'APPROVED') WHERE c.id = :courseId")
+    fun updateRatingByAverage(@Param("courseId") courseId: UUID)
+
 }

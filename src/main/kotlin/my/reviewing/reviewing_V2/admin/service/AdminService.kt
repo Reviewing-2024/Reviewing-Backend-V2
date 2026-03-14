@@ -7,6 +7,7 @@ import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.review.entity.Review
 import my.reviewing.reviewing_V2.review.entity.ReviewStateType
+import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.review.repository.ReviewRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -15,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AdminService(
-    private val reviewRepository: ReviewRepository
+    private val reviewRepository: ReviewRepository,
+    private val courseRepository: CourseRepository
 ) {
 
     @Transactional(readOnly = true)
@@ -37,6 +39,7 @@ class AdminService(
             BusinessException(ErrorCode.NOT_FOUND, "리뷰가 없습니다.")
         }
         review.state = ReviewStateType.APPROVED
+        courseRepository.updateRatingByAverage(review.course.id!!)
     }
 
     @Transactional
