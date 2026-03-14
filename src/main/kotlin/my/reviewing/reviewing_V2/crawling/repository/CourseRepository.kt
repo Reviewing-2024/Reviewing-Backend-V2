@@ -23,4 +23,8 @@ interface CourseRepository : JpaRepository<Course, UUID>, QuerydslPredicateExecu
     @Query("UPDATE Course c SET c.wishes = c.wishes - 1 WHERE c.id = :courseId")
     fun decrementWishes(@Param("courseId") courseId: UUID)
 
+    @Modifying
+    @Query("UPDATE Course c SET c.comments = c.comments + 1 WHERE c.id = :courseId")
+    fun incrementComments(@Param("courseId") courseId: UUID)
+
 }

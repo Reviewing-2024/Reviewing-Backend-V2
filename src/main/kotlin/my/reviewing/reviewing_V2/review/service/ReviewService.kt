@@ -55,6 +55,7 @@ class ReviewService(
             certification = certificationPath
         )
         reviewRepository.save(review)
+        courseRepository.incrementComments(courseId)
     }
 
     fun checkBeforeCreateReview(courseId: UUID, memberId: Long) {
