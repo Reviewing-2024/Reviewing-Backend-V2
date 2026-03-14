@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import my.reviewing.reviewing_V2.course.dto.CourseResponseDto
 import my.reviewing.reviewing_V2.crawling.service.CrawlingService
 import my.reviewing.reviewing_V2.global.api.ApiResponse
+import my.reviewing.reviewing_V2.search.dto.RecommendResponseDto
+import my.reviewing.reviewing_V2.search.service.RecommendService
 import my.reviewing.reviewing_V2.search.service.SearchService
 import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
@@ -21,7 +23,8 @@ import java.time.LocalDate
 @RequestMapping("/api/v1/search")
 class SearchController(
     private val crawlingService: CrawlingService,
-    private val searchService: SearchService
+    private val searchService: SearchService,
+    private val recommendService: RecommendService
 ) {
 
     @Operation(summary = "강의 임베딩 생성")
@@ -49,6 +52,18 @@ class SearchController(
     ): ResponseEntity<ApiResponse<Page<CourseResponseDto>>> {
         val memberId = authentication?.principal as? Long
         val result = searchService.searchCourses(keyword, page, size, memberId)
+        return ResponseEntity.ok(ApiResponse.ok(result))
+    }
+
+    @Operation(
+        summary = "강의 추천 챗봇 (RAG)",
+        description = "질문을 입력하면 관련 강의를 벡터 검색으로 찾아 GPT-4o가 추천 이유와 함께 답변"
+    )
+    @GetMapping("/recommend")
+    fun recommend(
+        @RequestParam query: String
+    ): ResponseEntity<ApiResponse<RecommendResponseDto>> {
+        val result = recommendService.recommend(query)
         return ResponseEntity.ok(ApiResponse.ok(result))
     }
 }
