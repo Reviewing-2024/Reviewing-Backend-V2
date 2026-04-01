@@ -9,7 +9,12 @@ import my.reviewing.reviewing_V2.global.api.ApiResponse
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
+import my.reviewing.reviewing_V2.review.dto.MyReviewResponseDto
+import my.reviewing.reviewing_V2.review.entity.ReviewStateType
+import my.reviewing.reviewing_V2.review.service.ReviewService
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Slice
+
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,7 +29,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/members")
 class MemberController(
     private val memberRepository: MemberRepository,
-    private val courseService: CourseService
+    private val courseService: CourseService,
+    private val reviewService: ReviewService
 ) {
 
     @Operation(
@@ -51,6 +57,22 @@ class MemberController(
     ): ResponseEntity<ApiResponse<Page<CourseResponseDto>>> {
         val memberId = authentication.principal as Long
         return ResponseEntity.ok(ApiResponse.ok(courseService.getWishedCourses(memberId, page, size)))
+    }
+
+    @Operation(
+        summary = "내 리뷰 목록",
+        description = "state 미입력 시 전체 조회. PENDING / APPROVED / REJECTED 선택 가능",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @GetMapping("/me/reviews")
+    fun getMyReviews(
+        @RequestParam(required = false) state: ReviewStateType?,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Slice<MyReviewResponseDto>>> {
+        val memberId = authentication.principal as Long
+        return ResponseEntity.ok(ApiResponse.ok(reviewService.findMyReviews(memberId, state, page, size)))
     }
 
     // TODO: 임시 API - 프로덕션 배포 전 삭제

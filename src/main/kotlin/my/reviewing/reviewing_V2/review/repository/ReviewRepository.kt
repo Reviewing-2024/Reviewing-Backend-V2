@@ -21,6 +21,8 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun findByCourseAndState(course: Course, state: ReviewStateType, pageable: Pageable): Slice<Review>
     fun findByState(state: ReviewStateType, pageable: Pageable): Slice<Review>
     fun countByState(state: ReviewStateType): Long
+    fun findByMemberId(memberId: Long, pageable: Pageable): Slice<Review>
+    fun findByMemberIdAndState(memberId: Long, state: ReviewStateType, pageable: Pageable): Slice<Review>
 
     @Modifying
     @Query("UPDATE Review r SET r.likes = r.likes + 1 WHERE r.id = :reviewId")

@@ -4,6 +4,7 @@ import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
+import my.reviewing.reviewing_V2.review.dto.MyReviewResponseDto
 import my.reviewing.reviewing_V2.review.dto.ReviewRequestDto
 import my.reviewing.reviewing_V2.review.dto.ReviewResponseDto
 import my.reviewing.reviewing_V2.review.dto.ReviewSortType
@@ -115,6 +116,17 @@ class ReviewService(
         ReviewSortType.LATEST      -> Sort.by(Sort.Direction.DESC, "createdAt")
         ReviewSortType.HIGH_RATING -> Sort.by(Sort.Direction.DESC, "rating")
         ReviewSortType.LOW_RATING  -> Sort.by(Sort.Direction.ASC, "rating")
+    }
+
+    @Transactional(readOnly = true)
+    fun findMyReviews(memberId: Long, state: ReviewStateType?, page: Int, size: Int): Slice<MyReviewResponseDto> {
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
+        val reviews = if (state == null) {
+            reviewRepository.findByMemberId(memberId, pageable)
+        } else {
+            reviewRepository.findByMemberIdAndState(memberId, state, pageable)
+        }
+        return reviews.map { MyReviewResponseDto.from(it) }
     }
 
     fun addLike(reviewId: Long, memberId: Long) {
