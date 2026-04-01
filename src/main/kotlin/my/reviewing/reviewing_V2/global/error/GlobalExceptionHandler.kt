@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.multipart.support.MissingServletRequestPartException
 import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
@@ -44,6 +45,16 @@ class GlobalExceptionHandler {
                 message = ErrorCode.INVALID_REQUEST.message,
                 details = details
             )
+        )
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
+    }
+
+    // multipart 파일 누락
+    @ExceptionHandler(MissingServletRequestPartException::class)
+    fun handleMissingPart(e: MissingServletRequestPartException): ResponseEntity<ApiResponse<Unit>> {
+        logger.warn("Missing request part: ${e.requestPartName}")
+        val body = ApiResponse.fail(
+            ApiError(code = ErrorCode.INVALID_REQUEST.code, message = "${e.requestPartName} 파일이 필요합니다.")
         )
         return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
     }
