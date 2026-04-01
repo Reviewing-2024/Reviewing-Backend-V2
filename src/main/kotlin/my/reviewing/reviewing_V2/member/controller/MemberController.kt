@@ -37,7 +37,7 @@ class MemberController(
 ) {
 
     @Operation(
-        summary = "테스트",
+        summary = "마이페이지",
         security = [SecurityRequirement(name = "JWT")]
     )
     @GetMapping("/test")
