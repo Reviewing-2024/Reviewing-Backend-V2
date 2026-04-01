@@ -16,6 +16,7 @@ import org.springframework.data.domain.Slice
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -107,10 +108,68 @@ class ReviewController(
         @PathVariable courseId: UUID,
         @RequestParam(defaultValue = "LATEST") sort: ReviewSortType,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int
+        @RequestParam(defaultValue = "10") size: Int,
+        authentication: Authentication?
     ): ResponseEntity<ApiResponse<Slice<ReviewResponseDto>>> {
-        val reviews = reviewService.findReviewsByCourse(courseId, sort, page, size)
+        val memberId = authentication?.principal as? Long
+        val reviews = reviewService.findReviewsByCourse(courseId, sort, page, size, memberId)
         return ResponseEntity.ok(ApiResponse.ok(reviews))
+    }
+
+    @Operation(
+        summary = "리뷰 좋아요",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @PostMapping("/{reviewId}/like")
+    fun addLike(
+        @PathVariable reviewId: Long,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        reviewService.addLike(reviewId, memberId)
+        return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+    @Operation(
+        summary = "리뷰 좋아요 취소",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @DeleteMapping("/{reviewId}/like")
+    fun removeLike(
+        @PathVariable reviewId: Long,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        reviewService.removeLike(reviewId, memberId)
+        return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+    @Operation(
+        summary = "리뷰 싫어요",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @PostMapping("/{reviewId}/dislike")
+    fun addDislike(
+        @PathVariable reviewId: Long,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        reviewService.addDislike(reviewId, memberId)
+        return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+    @Operation(
+        summary = "리뷰 싫어요 취소",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @DeleteMapping("/{reviewId}/dislike")
+    fun removeDislike(
+        @PathVariable reviewId: Long,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        reviewService.removeDislike(reviewId, memberId)
+        return ResponseEntity.ok(ApiResponse.ok())
     }
 
 }

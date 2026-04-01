@@ -11,16 +11,20 @@ data class ReviewResponseDto(
     val rating: BigDecimal,
     val likes: Int,
     val dislikes: Int,
+    val liked: Boolean,
+    val disliked: Boolean,
     val createdAt: Instant
 ) {
     companion object {
-        fun from(review: Review) = ReviewResponseDto(
+        fun from(review: Review, liked: Boolean = false, disliked: Boolean = false) = ReviewResponseDto(
             id = review.id!!,
             memberName = review.member.name,
             content = review.content,
             rating = review.rating,
             likes = review.likes,
             dislikes = review.dislikes,
+            liked = liked,
+            disliked = disliked,
             createdAt = review.createdAt!!
         )
     }

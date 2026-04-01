@@ -8,7 +8,10 @@ import my.reviewing.reviewing_V2.review.dto.ReviewRequestDto
 import my.reviewing.reviewing_V2.review.dto.ReviewResponseDto
 import my.reviewing.reviewing_V2.review.dto.ReviewSortType
 import my.reviewing.reviewing_V2.review.entity.Review
+import my.reviewing.reviewing_V2.review.entity.ReviewLike
+import my.reviewing.reviewing_V2.review.entity.ReviewLikeType
 import my.reviewing.reviewing_V2.review.entity.ReviewStateType
+import my.reviewing.reviewing_V2.review.repository.ReviewLikeRepository
 import my.reviewing.reviewing_V2.review.repository.ReviewRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Slice
@@ -24,6 +27,7 @@ import java.util.UUID
 @Transactional
 class ReviewService(
     private val reviewRepository: ReviewRepository,
+    private val reviewLikeRepository: ReviewLikeRepository,
     private val courseRepository: CourseRepository,
     private val memberRepository: MemberRepository
 ) {
@@ -80,22 +84,81 @@ class ReviewService(
         courseId: UUID,
         sort: ReviewSortType,
         page: Int,
-        size: Int
+        size: Int,
+        memberId: Long?
     ): Slice<ReviewResponseDto> {
         val course = courseRepository.findById(courseId).orElseThrow {
             BusinessException(ErrorCode.NOT_FOUND, "강의를 찾을 수 없습니다.")
         }
 
         val pageable = PageRequest.of(page, size, sortBy(sort))
+        val reviewSlice = reviewRepository.findByCourseAndState(course, ReviewStateType.APPROVED, pageable)
 
-        return reviewRepository.findByCourseAndState(course, ReviewStateType.APPROVED, pageable)
-            .map { review: Review -> ReviewResponseDto.from(review) }
+        if (memberId == null) {
+            return reviewSlice.map { review: Review -> ReviewResponseDto.from(review) }
+        }
+
+        val reviewIds = reviewSlice.content.map { it.id!! }
+        val likedIds = reviewLikeRepository.findReviewIdsByMemberIdAndType(reviewIds, memberId, ReviewLikeType.LIKE).toSet()
+        val dislikedIds = reviewLikeRepository.findReviewIdsByMemberIdAndType(reviewIds, memberId, ReviewLikeType.DISLIKE).toSet()
+
+        return reviewSlice.map { review: Review ->
+            ReviewResponseDto.from(
+                review,
+                liked = likedIds.contains(review.id),
+                disliked = dislikedIds.contains(review.id)
+            )
+        }
     }
 
     private fun sortBy(sort: ReviewSortType): Sort = when (sort) {
         ReviewSortType.LATEST      -> Sort.by(Sort.Direction.DESC, "createdAt")
         ReviewSortType.HIGH_RATING -> Sort.by(Sort.Direction.DESC, "rating")
         ReviewSortType.LOW_RATING  -> Sort.by(Sort.Direction.ASC, "rating")
+    }
+
+    fun addLike(reviewId: Long, memberId: Long) {
+        if (reviewLikeRepository.existsByReviewIdAndMemberIdAndType(reviewId, memberId, ReviewLikeType.LIKE)) {
+            throw BusinessException(ErrorCode.CONFLICT, "이미 좋아요를 눌렀습니다.")
+        }
+        val review = reviewRepository.findById(reviewId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "리뷰를 찾을 수 없습니다.")
+        }
+        val member = memberRepository.findById(memberId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        }
+        reviewLikeRepository.save(ReviewLike(review = review, member = member, type = ReviewLikeType.LIKE))
+        reviewRepository.incrementLikes(reviewId)
+    }
+
+    fun removeLike(reviewId: Long, memberId: Long) {
+        if (!reviewLikeRepository.existsByReviewIdAndMemberIdAndType(reviewId, memberId, ReviewLikeType.LIKE)) {
+            throw BusinessException(ErrorCode.NOT_FOUND, "좋아요 기록이 없습니다.")
+        }
+        reviewLikeRepository.deleteByReviewIdAndMemberIdAndType(reviewId, memberId, ReviewLikeType.LIKE)
+        reviewRepository.decrementLikes(reviewId)
+    }
+
+    fun addDislike(reviewId: Long, memberId: Long) {
+        if (reviewLikeRepository.existsByReviewIdAndMemberIdAndType(reviewId, memberId, ReviewLikeType.DISLIKE)) {
+            throw BusinessException(ErrorCode.CONFLICT, "이미 싫어요를 눌렀습니다.")
+        }
+        val review = reviewRepository.findById(reviewId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "리뷰를 찾을 수 없습니다.")
+        }
+        val member = memberRepository.findById(memberId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        }
+        reviewLikeRepository.save(ReviewLike(review = review, member = member, type = ReviewLikeType.DISLIKE))
+        reviewRepository.incrementDislikes(reviewId)
+    }
+
+    fun removeDislike(reviewId: Long, memberId: Long) {
+        if (!reviewLikeRepository.existsByReviewIdAndMemberIdAndType(reviewId, memberId, ReviewLikeType.DISLIKE)) {
+            throw BusinessException(ErrorCode.NOT_FOUND, "싫어요 기록이 없습니다.")
+        }
+        reviewLikeRepository.deleteByReviewIdAndMemberIdAndType(reviewId, memberId, ReviewLikeType.DISLIKE)
+        reviewRepository.decrementDislikes(reviewId)
     }
 
     private fun saveCertificationFile(file: MultipartFile): String {
