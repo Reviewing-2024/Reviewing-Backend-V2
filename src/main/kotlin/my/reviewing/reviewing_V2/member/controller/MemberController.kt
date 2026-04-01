@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "테스트 API")
+@Tag(name = "마이페이지 API")
 @RestController
 @RequestMapping("/api/v1/members")
 class MemberController(
@@ -37,7 +37,7 @@ class MemberController(
 ) {
 
     @Operation(
-        summary = "마이페이지",
+        summary = "테스트",
         security = [SecurityRequirement(name = "JWT")]
     )
     @GetMapping("/test")
