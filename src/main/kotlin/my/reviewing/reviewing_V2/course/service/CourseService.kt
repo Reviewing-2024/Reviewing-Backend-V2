@@ -151,6 +151,28 @@ class CourseService(
 
     }
 
+    @Transactional(readOnly = true)
+    fun getWishedCourses(memberId: Long, page: Int, size: Int): Page<CourseResponseDto> {
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"))
+        return courseWishRepository.findByMemberId(memberId, pageable).map { wish ->
+            val course = wish.course
+            CourseResponseDto(
+                id = course.id!!,
+                slug = course.slug,
+                title = course.title,
+                teacher = course.teacher ?: "",
+                thumbnailImage = course.thumbnailImage,
+                thumbnailVideo = course.thumbnailVideo,
+                url = course.url,
+                rating = course.rating,
+                wishes = course.wishes,
+                comments = course.comments,
+                platform = course.platform.englishName,
+                wished = true
+            )
+        }
+    }
+
     @Transactional
     fun addWish(courseId: UUID, memberId: Long) {
         if (courseWishRepository.existsByCourseIdAndMemberId(courseId, memberId)) {
