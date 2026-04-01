@@ -8,6 +8,7 @@ import my.reviewing.reviewing_V2.course.service.CourseService
 import my.reviewing.reviewing_V2.global.api.ApiResponse
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
+import my.reviewing.reviewing_V2.member.dto.UpdateNicknameRequestDto
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
 import my.reviewing.reviewing_V2.review.dto.MyReviewResponseDto
 import my.reviewing.reviewing_V2.review.entity.ReviewStateType
@@ -17,9 +18,11 @@ import org.springframework.data.domain.Slice
 
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -73,6 +76,24 @@ class MemberController(
     ): ResponseEntity<ApiResponse<Slice<MyReviewResponseDto>>> {
         val memberId = authentication.principal as Long
         return ResponseEntity.ok(ApiResponse.ok(reviewService.findMyReviews(memberId, state, page, size)))
+    }
+
+    @Operation(
+        summary = "닉네임 변경",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @PatchMapping("/me/nickname")
+    fun updateNickname(
+        @Valid @RequestBody dto: UpdateNicknameRequestDto,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        val member = memberRepository.findById(memberId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        }
+        member.name = dto.nickname
+        memberRepository.save(member)
+        return ResponseEntity.ok(ApiResponse.ok())
     }
 
     // TODO: 임시 API - 프로덕션 배포 전 삭제
