@@ -10,7 +10,8 @@ class AdminReviewResponseDto(
     val memberName: String,
     val content: String,
     val certificaton: String,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val rejectionReason: String?
 ) {
     companion object {
         fun from(review: Review) = AdminReviewResponseDto(
@@ -20,7 +21,8 @@ class AdminReviewResponseDto(
             memberName = review.member.name,
             content = review.content,
             certificaton = review.certification,
-            createdAt = review.createdAt!!
+            createdAt = review.createdAt!!,
+            rejectionReason = review.rejectionReason
         )
     }
 }
