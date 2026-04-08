@@ -76,9 +76,8 @@ class RecommendService(
 
                 응답 작성 지침:
                 - intro: 사용자의 질문을 한 문장으로 언급하고, 선정 기준(평점, 인기도 등)을 간결하게 설명. 같은 단어 반복 금지
-                - reason: 해당 강의의 평점, 리뷰 수, 찜 수 등 실제 수치를 언급하며 다른 강의와 차별화된 추천 이유 작성
                 - closing: 수강 순서나 난이도 조합 등 실용적인 조언을 1~2문장으로 작성. intro와 중복되는 내용 금지
-                - recommendations의 각 항목에는 반드시 강의 목록의 번호(index)와 reason 필드를 포함할 것
+                - recommendations의 각 항목에는 반드시 강의 목록의 번호(index)만 포함할 것
 
                 [참고 강의 목록]
                 $courseContext
@@ -100,8 +99,7 @@ class RecommendService(
                 title = course.title,
                 teacher = course.teacher,
                 platform = course.platform.englishName,
-                slug = course.slug,
-                reason = gptItem.reason
+                slug = course.slug
             )
         }
 

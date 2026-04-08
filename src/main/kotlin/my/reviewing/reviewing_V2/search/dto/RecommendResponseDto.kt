@@ -13,8 +13,7 @@ data class RecommendItem(
     val title: String,
     val teacher: String?,
     val platform: String,
-    val slug: String,
-    val reason: String
+    val slug: String
 )
 
 data class GptRecommendResponse(
@@ -24,6 +23,5 @@ data class GptRecommendResponse(
 )
 
 data class GptRecommendItem(
-    val index: Int,
-    val reason: String
+    val index: Int
 )

@@ -123,6 +123,7 @@ class AuthController(
 
         // 4. access token 생성 (헤더로 전달)
         val accessToken = jwtUtil.createAccessToken(userId, member.role)
+        println(accessToken)
         response.setHeader("Authorization", "Bearer $accessToken")
 
         return ResponseEntity.ok().body(ApiResponse.ok(mapOf("name" to member.name)))
