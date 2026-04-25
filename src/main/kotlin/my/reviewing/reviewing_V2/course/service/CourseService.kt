@@ -77,7 +77,7 @@ class CourseService(
             "reviews" -> "comments"
             else -> "createdAt"
         }
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy))
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy).and(Sort.by(Sort.Direction.ASC, "id")))
 
         val coursePage = courseRepository.findAll(builder, pageable)
 
