@@ -113,14 +113,14 @@ class ReviewService(
     }
 
     private fun sortBy(sort: ReviewSortType): Sort = when (sort) {
-        ReviewSortType.LATEST      -> Sort.by(Sort.Direction.DESC, "createdAt")
-        ReviewSortType.HIGH_RATING -> Sort.by(Sort.Direction.DESC, "rating")
-        ReviewSortType.LOW_RATING  -> Sort.by(Sort.Direction.ASC, "rating")
+        ReviewSortType.LATEST      -> Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.ASC, "id"))
+        ReviewSortType.HIGH_RATING -> Sort.by(Sort.Direction.DESC, "rating").and(Sort.by(Sort.Direction.ASC, "id"))
+        ReviewSortType.LOW_RATING  -> Sort.by(Sort.Direction.ASC, "rating").and(Sort.by(Sort.Direction.ASC, "id"))
     }
 
     @Transactional(readOnly = true)
     fun findMyReviews(memberId: Long, state: ReviewStateType?, page: Int, size: Int): Slice<MyReviewResponseDto> {
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.ASC, "id")))
         val reviews = if (state == null) {
             reviewRepository.findByMemberId(memberId, pageable)
         } else {
