@@ -4,8 +4,7 @@ import java.util.UUID
 
 data class RecommendResponseDto(
     val intro: String,
-    val recommendations: List<RecommendItem>,
-    val closing: String?
+    val recommendations: List<RecommendItem>
 )
 
 data class RecommendItem(
@@ -18,8 +17,7 @@ data class RecommendItem(
 
 data class GptRecommendResponse(
     val intro: String,
-    val recommendations: List<GptRecommendItem>,
-    val closing: String?
+    val recommendations: List<GptRecommendItem>
 )
 
 data class GptRecommendItem(

@@ -52,8 +52,7 @@ class RecommendService(
         if (courses.isEmpty()) {
             return RecommendResponseDto(
                 intro = "관련 강의를 찾지 못했습니다. 다른 키워드로 질문해보세요.",
-                recommendations = emptyList(),
-                closing = null
+                recommendations = emptyList()
             )
         }
 
@@ -66,30 +65,42 @@ class RecommendService(
                     " | 찜수: ${course.wishes}"
         }.joinToString("\n")
 
-        // 5. ChatClient로 RAG 프롬프트 실행 → GPT는 id, reason만 반환
-        val gptResponse = chatClient.prompt()
+        // 5. ChatClient로 RAG 프롬프트 실행 → GPT는 index만 반환
+        val rawContent = chatClient.prompt()
             .system("""
                 당신은 온라인 강의 추천 전문가입니다.
-                아래 강의 목록만을 참고하여 사용자의 질문에 맞는 강의를 추천해주세요.
+                아래 강의 목록에서 사용자의 질문과 관련된 강의를 골라주세요.
                 목록에 없는 강의는 절대 언급하지 마세요.
-                한국어로 답변해주세요.
 
-                응답 작성 지침:
-                - intro: 사용자의 질문을 한 문장으로 언급하고, 선정 기준(평점, 인기도 등)을 간결하게 설명. 같은 단어 반복 금지
-                - closing: 수강 순서나 난이도 조합 등 실용적인 조언을 1~2문장으로 작성. intro와 중복되는 내용 금지
-                - recommendations의 각 항목에는 반드시 강의 목록의 번호(index)만 포함할 것
+                [필수 규칙]
+                1. recommendations에 반드시 5개 이상 포함. 10개 목록 중 관련성이 조금이라도 있으면 모두 포함할 것.
+                2. intro는 1문장으로, 사용자의 질문 의도를 요약하고 어떤 기준으로 골랐는지만 간결하게 작성. 개별 강의 제목, 강사명은 intro에 절대 언급하지 말 것.
+                3. intro 존댓말(~해요, ~있어요, ~골라봤어요). 반말 금지.
+                4. intro 예시: "AI 에이전트 개발에 관심 있으시다면, 실습 중심의 강의 위주로 골라봤어요."
+
+                [응답 JSON 형식]
+                {"intro": "...", "recommendations": [{"index": 1}, {"index": 3}, {"index": 5}, {"index": 7}, {"index": 9}]}
+
+                recommendations.index = 강의 목록의 번호 (1부터 시작)
 
                 [참고 강의 목록]
                 $courseContext
             """.trimIndent())
             .user(query)
             .call()
-            .entity(GptRecommendResponse::class.java)
-            ?: return RecommendResponseDto(
+            .content()
+
+        val objectMapper = com.fasterxml.jackson.module.kotlin.jacksonObjectMapper()
+        val gptResponse = try {
+            objectMapper.readValue(rawContent, GptRecommendResponse::class.java)
+        } catch (e: Exception) {
+            return RecommendResponseDto(
                 intro = "추천 답변을 생성하지 못했습니다.",
-                recommendations = emptyList(),
-                closing = null
+                recommendations = emptyList()
             )
+        }
+
+        log.info("RAG GPT 응답 - intro: '{}', recommendations: {}", gptResponse.intro, gptResponse.recommendations)
 
         // 6. GPT가 반환한 번호(index)로 courses 리스트와 매핑
         val recommendations = gptResponse.recommendations.mapNotNull { gptItem ->
@@ -105,8 +116,7 @@ class RecommendService(
 
         return RecommendResponseDto(
             intro = gptResponse.intro,
-            recommendations = recommendations,
-            closing = gptResponse.closing
+            recommendations = recommendations
         )
     }
 }
