@@ -117,6 +117,20 @@ class ReviewController(
     }
 
     @Operation(
+        summary = "리뷰 삭제 (소프트 삭제)",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @DeleteMapping("/{reviewId}")
+    fun deleteReview(
+        @PathVariable reviewId: Long,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        reviewService.deleteReview(reviewId, memberId)
+        return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+    @Operation(
         summary = "리뷰 좋아요",
         security = [SecurityRequirement(name = "JWT")]
     )

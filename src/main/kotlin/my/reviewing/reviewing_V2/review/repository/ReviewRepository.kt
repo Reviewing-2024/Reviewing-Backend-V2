@@ -12,17 +12,17 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface ReviewRepository : JpaRepository<Review, Long> {
-    fun existsByMemberAndCourseAndStateIn(
+    fun existsByMemberAndCourseAndStateInAndDeletedAtIsNull(
         member: Member,
         course: Course,
         states: List<ReviewStateType>
     ): Boolean
 
-    fun findByCourseAndState(course: Course, state: ReviewStateType, pageable: Pageable): Slice<Review>
-    fun findByState(state: ReviewStateType, pageable: Pageable): Slice<Review>
-    fun countByState(state: ReviewStateType): Long
-    fun findByMemberId(memberId: Long, pageable: Pageable): Slice<Review>
-    fun findByMemberIdAndState(memberId: Long, state: ReviewStateType, pageable: Pageable): Slice<Review>
+    fun findByCourseAndStateAndDeletedAtIsNull(course: Course, state: ReviewStateType, pageable: Pageable): Slice<Review>
+    fun findByStateAndDeletedAtIsNull(state: ReviewStateType, pageable: Pageable): Slice<Review>
+    fun countByStateAndDeletedAtIsNull(state: ReviewStateType): Long
+    fun findByMemberIdAndDeletedAtIsNull(memberId: Long, pageable: Pageable): Slice<Review>
+    fun findByMemberIdAndStateAndDeletedAtIsNull(memberId: Long, state: ReviewStateType, pageable: Pageable): Slice<Review>
 
     @Modifying
     @Query("UPDATE Review r SET r.likes = r.likes + 1 WHERE r.id = :reviewId")

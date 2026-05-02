@@ -43,7 +43,7 @@ class ReviewService(
         }
 
         // PENDING, APPROVED 상태인 리뷰가 있으면 작성 불가 (REJECTED는 재작성 가능)
-        if (reviewRepository.existsByMemberAndCourseAndStateIn(
+        if (reviewRepository.existsByMemberAndCourseAndStateInAndDeletedAtIsNull(
                 member, course, listOf(ReviewStateType.PENDING, ReviewStateType.APPROVED)
             )
         ) {
@@ -72,7 +72,7 @@ class ReviewService(
             BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
         }
 
-        if (reviewRepository.existsByMemberAndCourseAndStateIn(
+        if (reviewRepository.existsByMemberAndCourseAndStateInAndDeletedAtIsNull(
                 member, course, listOf(ReviewStateType.PENDING, ReviewStateType.APPROVED)
             )
         ) {
@@ -93,7 +93,7 @@ class ReviewService(
         }
 
         val pageable = PageRequest.of(page, size, sortBy(sort))
-        val reviewSlice = reviewRepository.findByCourseAndState(course, ReviewStateType.APPROVED, pageable)
+        val reviewSlice = reviewRepository.findByCourseAndStateAndDeletedAtIsNull(course, ReviewStateType.APPROVED, pageable)
 
         if (memberId == null) {
             return reviewSlice.map { review: Review -> ReviewResponseDto.from(review) }
@@ -122,11 +122,25 @@ class ReviewService(
     fun findMyReviews(memberId: Long, state: ReviewStateType?, page: Int, size: Int): Slice<MyReviewResponseDto> {
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.ASC, "id")))
         val reviews = if (state == null) {
-            reviewRepository.findByMemberId(memberId, pageable)
+            reviewRepository.findByMemberIdAndDeletedAtIsNull(memberId, pageable)
         } else {
-            reviewRepository.findByMemberIdAndState(memberId, state, pageable)
+            reviewRepository.findByMemberIdAndStateAndDeletedAtIsNull(memberId, state, pageable)
         }
         return reviews.map { MyReviewResponseDto.from(it) }
+    }
+
+    fun deleteReview(reviewId: Long, memberId: Long) {
+        val review = reviewRepository.findById(reviewId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "리뷰를 찾을 수 없습니다.")
+        }
+        if (review.member.id != memberId) {
+            throw BusinessException(ErrorCode.FORBIDDEN, "본인의 리뷰만 삭제할 수 있습니다.")
+        }
+        if (review.deletedAt != null) {
+            throw BusinessException(ErrorCode.NOT_FOUND, "이미 삭제된 리뷰입니다.")
+        }
+        review.deletedAt = java.time.Instant.now()
+        courseRepository.decrementComments(review.course.id!!)
     }
 
     fun addLike(reviewId: Long, memberId: Long) {

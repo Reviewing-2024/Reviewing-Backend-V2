@@ -27,9 +27,9 @@ class AdminService(
         size: Int
     ): AdminReviewListResponseDto {
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.ASC, "id")))
-        val reviews = reviewRepository.findByState(state, pageable)
+        val reviews = reviewRepository.findByStateAndDeletedAtIsNull(state, pageable)
             .map { review: Review -> AdminReviewResponseDto.from(review) }
-        val pendingCount = reviewRepository.countByState(ReviewStateType.PENDING)
+        val pendingCount = reviewRepository.countByStateAndDeletedAtIsNull(ReviewStateType.PENDING)
         return AdminReviewListResponseDto(reviews = reviews, pendingCount = pendingCount)
     }
 
