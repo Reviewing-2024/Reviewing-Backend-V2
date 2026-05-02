@@ -43,8 +43,7 @@ class CustomOAuth2MemberService(
             )
             memberRepository.save(member)
         } else {
-            existMember.name = name
-            memberRepository.save(existMember)
+            existMember
         }
 
         val memberDto = MemberDto(
