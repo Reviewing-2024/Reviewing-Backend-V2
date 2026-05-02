@@ -6,10 +6,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import my.reviewing.reviewing_V2.course.dto.CourseResponseDto
 import my.reviewing.reviewing_V2.course.service.CourseService
 import my.reviewing.reviewing_V2.global.api.ApiResponse
-import my.reviewing.reviewing_V2.global.error.BusinessException
-import my.reviewing.reviewing_V2.global.error.ErrorCode
 import my.reviewing.reviewing_V2.member.dto.UpdateNicknameRequestDto
-import my.reviewing.reviewing_V2.member.repository.MemberRepository
+import my.reviewing.reviewing_V2.member.service.MemberService
 import my.reviewing.reviewing_V2.review.dto.MyReviewResponseDto
 import my.reviewing.reviewing_V2.review.entity.ReviewStateType
 import my.reviewing.reviewing_V2.review.service.ReviewService
@@ -31,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/members")
 class MemberController(
-    private val memberRepository: MemberRepository,
+    private val memberService: MemberService,
     private val courseService: CourseService,
     private val reviewService: ReviewService
 ) {
@@ -88,11 +86,7 @@ class MemberController(
         authentication: Authentication
     ): ResponseEntity<ApiResponse<Unit>> {
         val memberId = authentication.principal as Long
-        val member = memberRepository.findById(memberId).orElseThrow {
-            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
-        }
-        member.name = dto.nickname
-        memberRepository.save(member)
+        memberService.updateNickname(memberId, dto.nickname)
         return ResponseEntity.ok(ApiResponse.ok())
     }
 
@@ -103,11 +97,7 @@ class MemberController(
     )
     @PatchMapping("/{id}/role/admin")
     fun grantAdmin(@PathVariable id: Long): ResponseEntity<ApiResponse<Unit>> {
-        val member = memberRepository.findById(id).orElseThrow {
-            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
-        }
-        member.role = "ROLE_ADMIN"
-        memberRepository.save(member)
+        memberService.grantAdmin(id)
         return ResponseEntity.ok(ApiResponse.ok())
     }
 
