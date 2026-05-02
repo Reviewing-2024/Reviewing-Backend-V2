@@ -17,7 +17,10 @@ class Member(
     var name: String,
 
     @Column(nullable = false, length = 20)
-    var role: String
+    var role: String,
+
+    @Column(nullable = false)
+    var profileImage: String = "/profiles/default.png"
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

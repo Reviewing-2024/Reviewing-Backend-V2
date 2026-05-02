@@ -126,7 +126,7 @@ class AuthController(
         println(accessToken)
         response.setHeader("Authorization", "Bearer $accessToken")
 
-        return ResponseEntity.ok().body(ApiResponse.ok(mapOf("name" to member.name)))
+        return ResponseEntity.ok().body(ApiResponse.ok(mapOf("name" to member.name, "profileImage" to member.profileImage)))
     }
 
     @Operation(

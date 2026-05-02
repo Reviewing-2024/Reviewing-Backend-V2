@@ -20,10 +20,12 @@ import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "마이페이지 API")
 @RestController
@@ -87,6 +89,20 @@ class MemberController(
     ): ResponseEntity<ApiResponse<Unit>> {
         val memberId = authentication.principal as Long
         memberService.updateNickname(memberId, dto.nickname)
+        return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+    @Operation(
+        summary = "프로필 이미지 변경",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @PatchMapping("/me/profile-image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateProfileImage(
+        @RequestParam("file") file: MultipartFile,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        memberService.updateProfileImage(memberId, file)
         return ResponseEntity.ok(ApiResponse.ok())
     }
 
