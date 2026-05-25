@@ -110,7 +110,9 @@ class RecommendService(
                 title = course.title,
                 teacher = course.teacher,
                 platform = course.platform.englishName,
-                slug = course.slug
+                slug = course.slug,
+                thumbnailImage = course.thumbnailImage,
+                thumbnailVideo = course.thumbnailVideo
             )
         }
 

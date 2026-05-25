@@ -12,7 +12,9 @@ data class RecommendItem(
     val title: String,
     val teacher: String?,
     val platform: String,
-    val slug: String
+    val slug: String,
+    val thumbnailImage: String?,
+    val thumbnailVideo: String?
 )
 
 data class GptRecommendResponse(
