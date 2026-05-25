@@ -123,6 +123,7 @@ class CourseService(
         })
     }
 
+    @Transactional(readOnly = true)
     fun getCourse(platform: String, slug: String, memberId: Long?): ApiResponse<CourseResponseDto> {
 
         val findCourse = courseRepository.findByPlatformEnglishNameAndSlug(platform,slug)

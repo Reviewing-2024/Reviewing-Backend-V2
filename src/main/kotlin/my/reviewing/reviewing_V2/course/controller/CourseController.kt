@@ -54,7 +54,7 @@ class CourseController(
         )
     }
 
-    @Operation(summary = "단건 강의 조회 API")
+    @Operation(summary = "단건 강의 조회 API", security = [SecurityRequirement(name = "JWT")])
     @GetMapping("/{platform}/{slug}")
     fun getCourse(
         @PathVariable platform: String,
