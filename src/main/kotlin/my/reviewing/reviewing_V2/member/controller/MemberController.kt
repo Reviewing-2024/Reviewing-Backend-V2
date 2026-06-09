@@ -79,6 +79,22 @@ class MemberController(
     }
 
     @Operation(
+        summary = "프로필 통합 변경 (닉네임 + 이미지)",
+        description = "닉네임, 이미지 중 하나만 보내도 됩니다.",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @PatchMapping("/me/profile", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateProfile(
+        @RequestParam(required = false) nickname: String?,
+        @RequestParam(required = false) file: MultipartFile?,
+        authentication: Authentication
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val memberId = authentication.principal as Long
+        memberService.updateProfile(memberId, nickname, file)
+        return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+    @Operation(
         summary = "닉네임 변경",
         security = [SecurityRequirement(name = "JWT")]
     )

@@ -48,6 +48,22 @@ class MemberService(
     }
 
     @Transactional
+    fun updateProfile(memberId: Long, nickname: String?, file: MultipartFile?) {
+        val member = memberRepository.findById(memberId).orElseThrow {
+            BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        }
+        if (nickname != null) {
+            if (memberRepository.existsByName(nickname)) {
+                throw BusinessException(ErrorCode.CONFLICT, "이미 사용 중인 닉네임입니다.")
+            }
+            member.name = nickname
+        }
+        if (file != null) {
+            member.profileImage = saveProfileFile(memberId, file)
+        }
+    }
+
+    @Transactional
     fun grantAdmin(memberId: Long) {
         val member = memberRepository.findById(memberId).orElseThrow {
             BusinessException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.")
