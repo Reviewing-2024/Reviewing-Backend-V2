@@ -51,8 +51,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("org.springframework.batch:spring-batch-test")
 	runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("org.postgresql:postgresql")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:0.12.3")

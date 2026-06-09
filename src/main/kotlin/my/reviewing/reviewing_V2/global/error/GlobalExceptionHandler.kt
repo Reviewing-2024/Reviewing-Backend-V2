@@ -5,6 +5,8 @@ import my.reviewing.reviewing_V2.global.api.ApiResponse
 import my.reviewing.reviewing_V2.global.api.FieldErrorDetail
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
+import jakarta.validation.ConstraintViolationException
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -45,6 +47,32 @@ class GlobalExceptionHandler {
                 message = ErrorCode.INVALID_REQUEST.message,
                 details = details
             )
+        )
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
+    }
+
+    // @RequestParam @NotBlank 등 단순 파라미터 검증 실패
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolation(e: ConstraintViolationException): ResponseEntity<ApiResponse<Unit>> {
+        val details = e.constraintViolations.map {
+            FieldErrorDetail(
+                field = it.propertyPath.toString(),
+                reason = it.message
+            )
+        }
+        logger.warn("Constraint violation: ${e.message}")
+        val body = ApiResponse.fail(
+            ApiError(code = ErrorCode.INVALID_REQUEST.code, message = ErrorCode.INVALID_REQUEST.message, details = details)
+        )
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
+    }
+
+    // JSON 역직렬화 실패 (필수 필드 누락, 타입 불일치 등)
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleMessageNotReadable(e: HttpMessageNotReadableException): ResponseEntity<ApiResponse<Unit>> {
+        logger.warn("Message not readable: ${e.message}")
+        val body = ApiResponse.fail(
+            ApiError(code = ErrorCode.INVALID_REQUEST.code, message = "요청 형식이 올바르지 않습니다.")
         )
         return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
     }

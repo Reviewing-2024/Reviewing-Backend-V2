@@ -2,6 +2,7 @@ package my.reviewing.reviewing_V2.search.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.NotBlank
 import my.reviewing.reviewing_V2.course.dto.CourseResponseDto
 import my.reviewing.reviewing_V2.crawling.service.CrawlingService
 import my.reviewing.reviewing_V2.global.api.ApiResponse
@@ -11,6 +12,7 @@ import my.reviewing.reviewing_V2.search.service.SearchService
 import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 
 @Tag(name = "검색/추천 API")
+@Validated
 @RestController
 @RequestMapping("/api/v1/search")
 class SearchController(
@@ -45,7 +48,7 @@ class SearchController(
     )
     @GetMapping
     fun searchCourses(
-        @RequestParam keyword: String,
+        @NotBlank @RequestParam keyword: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         authentication: Authentication?
@@ -61,7 +64,7 @@ class SearchController(
     )
     @GetMapping("/recommend")
     fun recommend(
-        @RequestParam query: String
+        @NotBlank @RequestParam query: String
     ): ResponseEntity<ApiResponse<RecommendResponseDto>> {
         val result = recommendService.recommend(query)
         return ResponseEntity.ok(ApiResponse.ok(result))
