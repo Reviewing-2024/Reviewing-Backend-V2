@@ -6,6 +6,7 @@ import my.reviewing.reviewing_V2.global.api.FieldErrorDetail
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import jakarta.validation.ConstraintViolationException
+import org.springframework.web.multipart.MaxUploadSizeExceededException
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -73,6 +74,16 @@ class GlobalExceptionHandler {
         logger.warn("Message not readable: ${e.message}")
         val body = ApiResponse.fail(
             ApiError(code = ErrorCode.INVALID_REQUEST.code, message = "요청 형식이 올바르지 않습니다.")
+        )
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
+    }
+
+    // 파일 크기 초과
+    @ExceptionHandler(MaxUploadSizeExceededException::class)
+    fun handleMaxUploadSize(e: MaxUploadSizeExceededException): ResponseEntity<ApiResponse<Unit>> {
+        logger.warn("Max upload size exceeded: ${e.message}")
+        val body = ApiResponse.fail(
+            ApiError(code = ErrorCode.INVALID_REQUEST.code, message = "파일 크기가 너무 큽니다. 최대 10MB까지 업로드 가능합니다.")
         )
         return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(body)
     }
