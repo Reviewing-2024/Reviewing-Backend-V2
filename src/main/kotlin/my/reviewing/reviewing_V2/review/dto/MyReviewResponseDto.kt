@@ -19,7 +19,8 @@ data class MyReviewResponseDto(
     val courseTitle: String,
     val coursePlatform: String,
     val courseThumbnailImage: String?,
-    val courseUrl: String
+    val courseUrl: String,
+    val courseSlug: String
 ) {
     companion object {
         fun from(review: Review) = MyReviewResponseDto(
@@ -35,7 +36,8 @@ data class MyReviewResponseDto(
             courseTitle = review.course.title,
             coursePlatform = review.course.platform.englishName,
             courseThumbnailImage = review.course.thumbnailImage,
-            courseUrl = review.course.url
+            courseUrl = review.course.url,
+            courseSlug = review.course.slug
         )
     }
 }
