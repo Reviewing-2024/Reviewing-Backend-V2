@@ -62,12 +62,22 @@ class SecurityConfig(
         // path, role 설정하기
         http.authorizeHttpRequests { auth ->
             auth
-//                .requestMatchers("/").permitAll()
-//                .requestMatchers("/api/auth/refresh").permitAll()
-//                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // 관리자 전용
+                .requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/v1/crawling/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/members/*/role/admin").hasAuthority("ROLE_ADMIN")
+
+                // 마이페이지 (로그인 필요)
+                .requestMatchers("/api/v1/members/me/**").authenticated()
+
+                // 리뷰 작성, 좋아요/싫어요
                 .requestMatchers(HttpMethod.POST, "/api/v1/reviews/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/reviews/**").authenticated()
+
+                // 찜
                 .requestMatchers(HttpMethod.POST, "/api/v1/courses/*/wish").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/courses/*/wish").authenticated()
+
                 .anyRequest().permitAll()
         }
 
