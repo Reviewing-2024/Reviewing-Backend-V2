@@ -79,6 +79,9 @@ dependencies {
 		exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
 	}
 	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
+	// AWS SDK S3
+	implementation("software.amazon.awssdk:s3:2.29.52")
 }
 
 kotlin {

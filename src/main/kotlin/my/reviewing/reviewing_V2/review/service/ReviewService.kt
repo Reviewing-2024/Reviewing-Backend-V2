@@ -3,6 +3,7 @@ package my.reviewing.reviewing_V2.review.service
 import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
+import my.reviewing.reviewing_V2.global.storage.FileStorageService
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
 import my.reviewing.reviewing_V2.review.dto.MyReviewResponseDto
 import my.reviewing.reviewing_V2.review.dto.ReviewRequestDto
@@ -20,8 +21,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.UUID
 
 @Service
@@ -30,7 +29,8 @@ class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val reviewLikeRepository: ReviewLikeRepository,
     private val courseRepository: CourseRepository,
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val fileStorageService: FileStorageService
 ) {
 
     fun createReview(courseId: UUID, memberId: Long, dto: ReviewRequestDto, certificationFile: MultipartFile) {
@@ -50,7 +50,7 @@ class ReviewService(
             throw BusinessException(ErrorCode.CONFLICT, "이미 리뷰를 작성하셨습니다.")
         }
 
-        val certificationPath = saveCertificationFile(certificationFile)
+        val certificationPath = fileStorageService.saveCertificationFile(certificationFile)
 
         val review = Review(
             member = member,
@@ -187,19 +187,5 @@ class ReviewService(
         reviewRepository.decrementDislikes(reviewId)
     }
 
-    private fun saveCertificationFile(file: MultipartFile): String {
-        val uploadDir = Paths.get(
-            System.getProperty("user.dir"),
-            "src", "main", "resources", "static", "certifications"
-        )
 
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir)
-        }
-
-        val fileName = "${UUID.randomUUID()}_${file.originalFilename}"
-        Files.write(uploadDir.resolve(fileName), file.bytes)
-
-        return "/certifications/$fileName"
-    }
 }
