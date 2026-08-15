@@ -57,3 +57,6 @@ spring:
         index-name: courses
         dimensions: 512
         initialize-schema: false
+
+app:
+  frontend-url: http://localhost:5173

@@ -31,6 +31,9 @@ spring:
   elasticsearch:
     uris: ${SPRING_ELASTICSEARCH_URIS}
 
+app:
+  frontend-url: https://www.reviewing.kr
+
 cloud:
   aws:
     s3:

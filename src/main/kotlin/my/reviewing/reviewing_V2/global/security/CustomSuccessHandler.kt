@@ -5,13 +5,15 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import my.reviewing.reviewing_V2.global.jwt.JWTUtil
 import my.reviewing.reviewing_V2.member.dto.CustomOAuth2User
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
 import org.springframework.stereotype.Component
 
 @Component
 class CustomSuccessHandler(
-    private val jwtUtil: JWTUtil
+    private val jwtUtil: JWTUtil,
+    @Value("\${app.frontend-url}") private val frontendUrl: String
 ): SimpleUrlAuthenticationSuccessHandler() {
 
     override fun onAuthenticationSuccess(
@@ -28,7 +30,7 @@ class CustomSuccessHandler(
         val refreshToken = jwtUtil.createRefreshToken(userId)
 
         response.addCookie(createCookie("refresh", refreshToken))
-        response.sendRedirect("http://localhost:5173/login/redirect")
+        response.sendRedirect("$frontendUrl/login/redirect")
 
     }
 
@@ -37,7 +39,7 @@ class CustomSuccessHandler(
         val cookie: Cookie = Cookie(key, value)
         cookie.maxAge = 24 * 60 * 60 // 24시간
         cookie.path = "/"
-//        cookie.secure = true https일 경우에 활성화
+        cookie.secure = frontendUrl.startsWith("https")
         cookie.isHttpOnly = true
 
         return cookie
