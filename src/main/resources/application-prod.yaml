@@ -1,0 +1,40 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-name: kakao
+            client-id: ${KAKAO_CLIENT_ID}
+            redirect-uri: ${KAKAO_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+
+  jwt:
+    secret: ${JWT_SECRET}
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+
+  elasticsearch:
+    uris: ${SPRING_ELASTICSEARCH_URIS}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET}
+      base-url: ${S3_BASE_URL}
+    region:
+      static: ap-northeast-2

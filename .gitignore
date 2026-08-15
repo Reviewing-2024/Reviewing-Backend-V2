@@ -39,5 +39,5 @@ out/
 ### Kotlin ###
 .kotlin
 
-/src/main/resources/application.yaml
-docker-compose.yml
+/src/main/resources/application-local.yaml
+.env
