@@ -14,7 +14,7 @@ class CorsMvcConfig: WebMvcConfigurer {
 
         registry.addMapping("/**")
             .exposedHeaders("Set-Cookie")
-            .allowedOrigins("http://localhost:5173");
+            .allowedOrigins("http://localhost:5173", "https://www.reviewing.kr");
 
     }
 }

@@ -29,7 +29,7 @@ class SecurityConfig(
         http.cors {
             it.configurationSource { _: HttpServletRequest ->
                 CorsConfiguration().apply {
-                    allowedOrigins = listOf("http://localhost:5173")
+                    allowedOrigins = listOf("http://localhost:5173", "https://www.reviewing.kr")
                     allowedMethods = listOf("*")
                     allowedHeaders = listOf("*")
                     allowCredentials = true
