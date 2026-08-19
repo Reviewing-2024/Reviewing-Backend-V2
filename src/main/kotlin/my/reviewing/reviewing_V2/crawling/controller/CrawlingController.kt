@@ -1,6 +1,7 @@
 package my.reviewing.reviewing_V2.crawling.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import my.reviewing.reviewing_V2.crawling.entity.Platform
 import my.reviewing.reviewing_V2.crawling.service.CrawlingService
@@ -17,6 +18,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Tag(name = "크롤링 API (백엔드에서만 사용)", description = "크롤링 관련 API")
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/v1/crawling")
 class CrawlingController(
