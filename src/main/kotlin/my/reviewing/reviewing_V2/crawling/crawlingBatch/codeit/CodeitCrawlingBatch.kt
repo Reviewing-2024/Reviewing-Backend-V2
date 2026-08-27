@@ -121,7 +121,7 @@ class CodeitCrawlingBatch(
                     title = dto.title,
                     url = dto.courseUrl,
                     slug = dto.courseSlug,
-                    thumbnailImage = null,
+                    thumbnailImage = "https://reviewing-back.s3.ap-northeast-2.amazonaws.com/lecture_thumbnail_codeit.png",
                     thumbnailVideo = null,
                     teacher = dto.teacher.ifEmpty { null }
                 )

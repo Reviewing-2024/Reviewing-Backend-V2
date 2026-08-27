@@ -121,6 +121,7 @@ open class InflearnReader(
             addArguments("--headless=new")
             addArguments("--no-sandbox")
             addArguments("--disable-gpu")
+            addArguments("--disable-dev-shm-usage")
             addArguments("--disable-popup-blocking")
             addArguments("--disable-notifications")
             addArguments("--disable-blink-features=AutomationControlled")

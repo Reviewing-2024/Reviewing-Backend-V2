@@ -103,6 +103,7 @@ open class FastcampusReader(
             addArguments("--headless=new")
             addArguments("--no-sandbox")
             addArguments("--disable-gpu")
+            addArguments("--disable-dev-shm-usage")
             addArguments("--disable-popup-blocking")   // 브라우저 팝업 차단
             addArguments("--disable-notifications")    // 알림 팝업 차단
             addArguments("--disable-default-apps")
