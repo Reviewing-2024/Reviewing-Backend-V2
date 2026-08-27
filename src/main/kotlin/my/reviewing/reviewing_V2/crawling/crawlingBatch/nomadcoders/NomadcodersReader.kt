@@ -5,17 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import my.reviewing.reviewing_V2.crawling.entity.Course
 import my.reviewing.reviewing_V2.crawling.entity.Platform
 import my.reviewing.reviewing_V2.crawling.repository.PlatformRepository
-import org.openqa.selenium.By
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.support.ui.ExpectedConditions
-import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
 import org.springframework.batch.item.ExecutionContext
 import org.springframework.batch.item.ItemStreamException
 import org.springframework.batch.item.ItemStreamReader
-import java.time.Duration
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.web.client.RestTemplate
 
 open class NomadcodersReader(
     private val platformRepository: PlatformRepository,
@@ -28,7 +25,6 @@ open class NomadcodersReader(
         private const val READ_COUNT_KEY = "nomadcoders.read.count"
     }
 
-    private lateinit var driver: WebDriver
     private lateinit var platform: Platform
     private lateinit var courseKeys: List<String>
     private lateinit var apolloState: JsonNode
@@ -38,54 +34,35 @@ open class NomadcodersReader(
     override fun open(executionContext: ExecutionContext) {
         log.info("노마드코더 크롤링 시작")
 
-        // 1. 이전 상태 복원 (재시작 시)
         currentIndex = executionContext.getInt(READ_COUNT_KEY, 0)
         if (currentIndex > 0) {
             log.info("재시작 감지: {}번째부터 이어서 처리", currentIndex)
         }
 
-        // 2. Platform 조회
         platform = platformRepository.findByKoreanName("노마드코더")
             ?: throw ItemStreamException("노마드코더 플랫폼을 찾을 수 없습니다")
 
-        // 3. ChromeDriver 초기화
-        val options = ChromeOptions().apply {
-            addArguments("--headless=new")
-            addArguments("--no-sandbox")
-            addArguments("--disable-gpu")
-            addArguments("--disable-dev-shm-usage")
-            addArguments("--window-size=1920,1080")
-            addArguments("--disable-blink-features=AutomationControlled")
-            addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-        }
-        driver = ChromeDriver(options)
-        log.debug("ChromeDriver 초기화 완료")
-
-        // 4. 페이지 접속 및 JSON 파싱
         val url = "https://nomadcoders.co/courses"
         log.info("페이지 접속: {}", url)
 
-        try {
-            driver.get(url)
-            val wait = WebDriverWait(driver, Duration.ofSeconds(10))
-            wait.until(
-                ExpectedConditions.presenceOfElementLocated(
-                    By.cssSelector("script#__NEXT_DATA__")
-                )
-            )
-            log.debug("페이지 로드 완료")
+        val html = try {
+            val headers = HttpHeaders().apply {
+                set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                set("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7")
+            }
+            val response = RestTemplate().exchange(url, HttpMethod.GET, HttpEntity<Void>(headers), String::class.java)
+            response.body ?: throw ItemStreamException("응답 body가 null입니다")
         } catch (e: Exception) {
             log.error("페이지 접속 실패: {}", e.message)
             throw ItemStreamException("페이지 접속 실패", e)
         }
 
-        val pageSource = driver.pageSource
-            ?: throw ItemStreamException("페이지 소스를 가져올 수 없습니다")
+        log.debug("페이지 로드 완료")
 
-        val jsonData = extractNextData(pageSource)
+        val jsonData = extractNextData(html)
             ?: throw ItemStreamException("JSON 데이터를 찾을 수 없습니다")
 
-        // 5. JSON 파싱 (Course 객체 생성은 안 함)
         val root: JsonNode = try {
             objectMapper.readTree(jsonData)
         } catch (e: Exception) {
@@ -103,7 +80,6 @@ open class NomadcodersReader(
             throw ItemStreamException("Apollo state missing")
         }
 
-        // 6. course:* 키만 추출 (Course 객체는 read()에서 생성)
         courseKeys = apolloState.fieldNames()
             .asSequence()
             .filter { it.startsWith("course:") }
@@ -145,14 +121,6 @@ open class NomadcodersReader(
     }
 
     override fun close() {
-        if (::driver.isInitialized) {
-            try {
-                driver.quit()
-                log.info("ChromeDriver 종료")
-            } catch (e: Exception) {
-                log.warn("ChromeDriver 종료 중 에러 (무시됨): {}", e.message)
-            }
-        }
     }
 
     private fun extractNextData(pageSource: String): String? {
