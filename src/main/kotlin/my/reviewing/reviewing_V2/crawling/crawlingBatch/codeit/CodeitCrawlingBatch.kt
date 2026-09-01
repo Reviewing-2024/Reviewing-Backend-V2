@@ -99,15 +99,19 @@ class CodeitCrawlingBatch(
     }
 
     @Bean
+    @StepScope
     fun codeitProcessor(): ItemProcessor<CrawlingCourseDto, SubCategoryCourse> {
+        val courseCache = HashMap<String, Course>()
         return ItemProcessor { dto ->
-            val existingCourse = courseRepository.findByPlatformAndSlug(dto.platform, dto.courseSlug)
+            val cacheKey = "${dto.platform.id}:${dto.courseSlug}"
+            val existingCourse = courseCache[cacheKey]
+                ?: courseRepository.findFirstByPlatformAndSlug(dto.platform, dto.courseSlug)
+                    ?.also { courseCache[cacheKey] = it }
 
             val course: Course
             if (existingCourse != null) {
                 course = existingCourse
 
-                // SubCategoryCourse 매핑이 있는지 확인
                 val existingMapping = subCategoryCourseRepository.findByCourseAndSubCategory(
                     course, dto.subCategory
                 )
@@ -115,7 +119,6 @@ class CodeitCrawlingBatch(
                     return@ItemProcessor null
                 }
             } else {
-                // 새 강의 생성 (코드잇 특성상 thumbnailImage/Video = null, teacher = null)
                 course = Course(
                     platform = dto.platform,
                     title = dto.title,
@@ -125,6 +128,7 @@ class CodeitCrawlingBatch(
                     thumbnailVideo = null,
                     teacher = dto.teacher.ifEmpty { null }
                 )
+                courseCache[cacheKey] = course
             }
 
             SubCategoryCourse(

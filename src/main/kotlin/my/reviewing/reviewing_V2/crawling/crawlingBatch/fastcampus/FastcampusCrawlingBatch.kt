@@ -90,9 +90,14 @@ class FastcampusCrawlingBatch(
     }
 
     @Bean
+    @StepScope
     fun fastcampusProcessor(): ItemProcessor<CrawlingCourseDto, SubCategoryCourse> {
+        val courseCache = HashMap<String, Course>()
         return ItemProcessor { dto ->
-            val existingCourse = courseRepository.findByPlatformAndSlug(dto.platform, dto.courseSlug)
+            val cacheKey = "\${dto.platform.id}:\${dto.courseSlug}"
+            val existingCourse = courseCache[cacheKey]
+                ?: courseRepository.findFirstByPlatformAndSlug(dto.platform, dto.courseSlug)
+                    ?.also { courseCache[cacheKey] = it }
 
             val course: Course
             if (existingCourse != null) {
@@ -114,6 +119,7 @@ class FastcampusCrawlingBatch(
                     thumbnailVideo = null,
                     teacher = dto.teacher
                 )
+                courseCache[cacheKey] = course
             }
 
             SubCategoryCourse(

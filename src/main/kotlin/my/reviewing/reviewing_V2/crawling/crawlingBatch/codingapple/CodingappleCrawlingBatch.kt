@@ -64,7 +64,7 @@ class CodingappleCrawlingBatch(
     @Bean
     fun codingappleProcessor(): ItemProcessor<Course, Course> {
         return ItemProcessor { course ->
-            val existing = courseRepository.findByPlatformAndSlug(course.platform, course.slug)
+            val existing = courseRepository.findFirstByPlatformAndSlug(course.platform, course.slug)
             if (existing != null) null else course
         }
     }

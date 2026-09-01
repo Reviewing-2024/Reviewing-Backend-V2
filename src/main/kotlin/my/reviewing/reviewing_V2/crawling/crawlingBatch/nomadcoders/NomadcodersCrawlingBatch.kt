@@ -60,7 +60,7 @@ class NomadcodersCrawlingBatch(
     fun nomadcodersProcessor(): ItemProcessor<Course, Course> {
         return ItemProcessor { course ->
             val existingCourse =
-                courseRepository.findByPlatformAndSlug(course.platform, course.slug)
+                courseRepository.findFirstByPlatformAndSlug(course.platform, course.slug)
             if (existingCourse != null) {
 //                log.debug("이미 존재하는 강의, 건너뛰기: {}", course.title)
                 null

@@ -11,7 +11,7 @@ import java.util.UUID
 
 interface CourseRepository : JpaRepository<Course, UUID>, QuerydslPredicateExecutor<Course> {
 
-    fun findByPlatformAndSlug(platform: Platform, slug: String): Course?
+    fun findFirstByPlatformAndSlug(platform: Platform, slug: String): Course?
 
     fun findByPlatformEnglishNameAndSlug(platform: String, slug: String): Course?
 

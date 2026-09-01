@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -17,7 +18,7 @@ import java.time.Instant
 import java.util.UUID
 
 @Entity
-@Table(name = "courses")
+@Table(name = "courses", uniqueConstraints = [UniqueConstraint(columnNames = ["platform_id", "slug"])])
 @EntityListeners(AuditingEntityListener::class)
 class Course (
 

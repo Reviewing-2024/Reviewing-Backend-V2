@@ -99,28 +99,26 @@ class InflearnCrawlingBatch(
     }
 
     @Bean
+    @StepScope
     fun inflearnProcessor(): ItemProcessor<CrawlingCourseDto, SubCategoryCourse> {
+        val courseCache = HashMap<String, Course>()
         return ItemProcessor { dto ->
-            // 1. 기존 강의 조회
-            val existingCourse = courseRepository.findByPlatformAndSlug(dto.platform, dto.courseSlug)
+            val cacheKey = "${dto.platform.id}:${dto.courseSlug}"
+            val existingCourse = courseCache[cacheKey]
+                ?: courseRepository.findFirstByPlatformAndSlug(dto.platform, dto.courseSlug)
+                    ?.also { courseCache[cacheKey] = it }
 
             val course: Course
             if (existingCourse != null) {
-                // 강의가 이미 존재
                 course = existingCourse
 
-                // SubCategoryCourse 매핑이 있는지 확인
                 val existingMapping = subCategoryCourseRepository.findByCourseAndSubCategory(
                     course, dto.subCategory
                 )
                 if (existingMapping != null) {
-//                    log.debug("이미 존재하는 강의+매핑, 건너뛰기: {}", dto.title)
                     return@ItemProcessor null
                 }
-
-//                log.debug("기존 강의에 카테고리 매핑 추가: {} → {}", dto.title, dto.subCategory.name)
             } else {
-                // 새 강의 생성
                 course = Course(
                     platform = dto.platform,
                     title = dto.title,
@@ -130,10 +128,9 @@ class InflearnCrawlingBatch(
                     thumbnailVideo = dto.thumbnailVideo,
                     teacher = dto.teacher
                 )
-//                log.debug("새 강의 저장 대상: {}", dto.title)
+                courseCache[cacheKey] = course
             }
 
-            // SubCategoryCourse 반환 (Writer에서 저장)
             SubCategoryCourse(
                 course = course,
                 subCategory = dto.subCategory
