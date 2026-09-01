@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: reviewing-elasticsearch:latest
+    image: reviewing-v2-elasticsearch:latest
     container_name: reviewing-elasticsearch
     environment:
       - discovery.type=single-node
