@@ -38,6 +38,7 @@ import org.springframework.transaction.PlatformTransactionManager
  */
 @Configuration
 class CodeitCrawlingBatch(
+    @Value("\${cloud.aws.s3.base-url}") private val s3BaseUrl: String,
     private val jobRepository: JobRepository,
     private val platformTransactionManager: PlatformTransactionManager,
     private val courseRepository: CourseRepository,
@@ -124,7 +125,7 @@ class CodeitCrawlingBatch(
                     title = dto.title,
                     url = dto.courseUrl,
                     slug = dto.courseSlug,
-                    thumbnailImage = "https://reviewing-back.s3.ap-northeast-2.amazonaws.com/lecture_thumbnail_codeit.png",
+                    thumbnailImage = "$s3BaseUrl/lecture_thumbnail_codeit.png",
                     thumbnailVideo = null,
                     teacher = dto.teacher.ifEmpty { null }
                 )
