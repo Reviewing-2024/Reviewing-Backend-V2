@@ -2,12 +2,10 @@ package my.reviewing.reviewing_V2.global.channeltalk
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 @Service
-@Transactional
 class ChannelTalkService(
     @Value("\${channelTalk.secret-key}") private val secretKey: String
 ) {
