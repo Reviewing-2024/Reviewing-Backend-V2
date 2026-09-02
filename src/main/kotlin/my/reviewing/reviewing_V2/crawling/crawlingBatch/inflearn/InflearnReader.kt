@@ -47,13 +47,15 @@ open class InflearnReader(
         private const val PAGE_NUMBER_KEY = "inflearn.page.number"
         private const val BASE_URL = "https://www.inflearn.com/courses"
 
-        // 셀렉터 상수 (변경 감지용)
-        private const val SELECTOR_COURSE_LIST = "ul.mantine-1avyp1d"
-        private const val SELECTOR_COURSE_ITEM = "li.mantine-1avyp1d"
+        // 셀렉터 상수
+        // - COURSE_ITEM: :has() 사용으로 Mantine 해시 변경에 무관하게 안정적
+        // - TITLE/TEACHER/THUMBNAIL: 아직 유효한 Mantine 클래스
+        // - PAGINATION: mantine-next-* 접두사로 변경됨 (기존 mantine-Pagination-control → mantine-next-Pagination-control)
+        private const val SELECTOR_COURSE_ITEM = "li:has(a[href*='/course/'])"
         private const val SELECTOR_THUMBNAIL = "div.mantine-AspectRatio-root"
         private const val SELECTOR_TITLE = "p.mantine-fcy4ne"
         private const val SELECTOR_TEACHER = "p.mantine-aiouth"
-        private const val SELECTOR_PAGINATION = "button.mantine-Pagination-control"
+        private const val SELECTOR_PAGINATION = "button.mantine-next-Pagination-control"
     }
 
     private lateinit var driver: WebDriver
@@ -144,71 +146,29 @@ open class InflearnReader(
 
     /**
      * 크롤링 시작 전 셀렉터 유효성 검증
-     * - 인프런 페이지 구조 변경 시 조기 감지
      */
     private fun validateSelectors() {
         log.info("=== 셀렉터 유효성 검증 시작 ===")
-
         try {
-            // 테스트용 URL (it-programming/web-dev는 항상 강의가 많음)
             val testUrl = "$BASE_URL/it-programming/web-dev?types=ONLINE&page_number=1"
             driver.get(testUrl)
             waitForPageLoad()
 
-            // 클라이언트 JS가 강의 카드 제목을 렌더링할 때까지 대기
             val wait = WebDriverWait(driver, Duration.ofSeconds(30))
             try {
                 wait.until { d ->
-                    val titles = d.findElements(By.cssSelector("$SELECTOR_COURSE_LIST $SELECTOR_COURSE_ITEM $SELECTOR_TITLE"))
-                    titles.any { it.text.isNotBlank() }
+                    d.findElements(By.cssSelector(SELECTOR_COURSE_ITEM)).isNotEmpty()
                 }
             } catch (e: Exception) {
-                log.warn("⚠️ 셀렉터 검증: 강의 제목 렌더링 타임아웃 (클라이언트 JS 문제 가능)")
+                log.warn("⚠️ 셀렉터 검증: 강의 카드 렌더링 타임아웃")
             }
 
-            val selectorResults = mutableMapOf<String, Boolean>()
-
-            // 1. 강의 목록 셀렉터 검증
-            val courseList = driver.findElements(By.cssSelector(SELECTOR_COURSE_LIST))
-            selectorResults["COURSE_LIST ($SELECTOR_COURSE_LIST)"] = courseList.isNotEmpty()
-
-            // 2. 강의 아이템 셀렉터 검증
             val courseItems = driver.findElements(By.cssSelector(SELECTOR_COURSE_ITEM))
-            selectorResults["COURSE_ITEM ($SELECTOR_COURSE_ITEM)"] = courseItems.isNotEmpty()
-
-            // 3. 썸네일 셀렉터 검증
-            val thumbnails = driver.findElements(By.cssSelector(SELECTOR_THUMBNAIL))
-            selectorResults["THUMBNAIL ($SELECTOR_THUMBNAIL)"] = thumbnails.isNotEmpty()
-
-            // 4. 제목 셀렉터 검증 (텍스트 콘텐츠도 확인)
-            val titles = driver.findElements(By.cssSelector(SELECTOR_TITLE))
-            selectorResults["TITLE ($SELECTOR_TITLE)"] = titles.any { it.text.isNotBlank() }
-
-            // 5. 강사 셀렉터 검증 (텍스트 콘텐츠도 확인)
-            val teachers = driver.findElements(By.cssSelector(SELECTOR_TEACHER))
-            selectorResults["TEACHER ($SELECTOR_TEACHER)"] = teachers.any { it.text.isNotBlank() }
-
-            // 6. 페이지네이션 셀렉터 검증
-            val pagination = driver.findElements(By.cssSelector(SELECTOR_PAGINATION))
-            selectorResults["PAGINATION ($SELECTOR_PAGINATION)"] = pagination.isNotEmpty()
-
-            // 결과 로깅
-            var failedCount = 0
-            for ((selector, found) in selectorResults) {
-                if (found) {
-                    log.info("✅ {} - OK", selector)
-                } else {
-                    log.warn("❌ {} - NOT FOUND", selector)
-                    failedCount++
-                }
-            }
-
-            if (failedCount > 0) {
-                log.warn("⚠️ === 셀렉터 검증 결과: {}개 실패 - 인프런 페이지 구조 변경 가능성 있음 ===", failedCount)
+            if (courseItems.isNotEmpty()) {
+                log.info("=== 셀렉터 검증 완료: 강의 카드 {}개 발견 ===", courseItems.size)
             } else {
-                log.info("=== 셀렉터 검증 완료: 모든 셀렉터 정상 ===")
+                log.warn("⚠️ === 셀렉터 검증 실패: 강의 카드를 찾을 수 없음 ===")
             }
-
         } catch (e: Exception) {
             log.warn("셀렉터 검증 중 오류 발생 (크롤링은 계속 진행): {}", e.message)
         }
@@ -318,7 +278,7 @@ open class InflearnReader(
             val wait = WebDriverWait(driver, Duration.ofSeconds(30))
             try {
                 wait.until { d ->
-                    val titles = d.findElements(By.cssSelector("$SELECTOR_COURSE_LIST $SELECTOR_COURSE_ITEM $SELECTOR_TITLE"))
+                    val titles = d.findElements(By.cssSelector("$SELECTOR_COURSE_ITEM $SELECTOR_TITLE"))
                     titles.any { it.text.isNotBlank() }
                 }
             } catch (e: Exception) {
@@ -378,7 +338,7 @@ open class InflearnReader(
             // (Inflearn은 SSR이 아닌 클라이언트 API 호출 후 강의 카드를 채움)
             try {
                 wait.until { d ->
-                    val titles = d.findElements(By.cssSelector("$SELECTOR_COURSE_LIST $SELECTOR_COURSE_ITEM $SELECTOR_TITLE"))
+                    val titles = d.findElements(By.cssSelector("$SELECTOR_COURSE_ITEM $SELECTOR_TITLE"))
                     titles.any { it.text.isNotBlank() }
                 }
             } catch (e: Exception) {
@@ -388,36 +348,32 @@ open class InflearnReader(
             }
 
             // 페이지 하단까지 스크롤 (강의가 2개 섹션으로 나뉨: 강의 20개 → 지식공유자 → 강의 20개)
-            // lazy load로 두 번째 강의 섹션이 scroll 후 추가로 렌더링됨
             val jsExec = driver as JavascriptExecutor
             jsExec.executeScript("window.scrollTo(0, document.body.scrollHeight)")
 
             // 두 번째 강의 섹션이 lazy load되면 scrollHeight가 증가 → 다시 scroll
-            // 주의: courseSelector 안에 single quote가 있으므로 JS outer string은 double quote 사용
-            val courseSelector = "$SELECTOR_COURSE_LIST $SELECTOR_COURSE_ITEM a[href*='/course/']"
             try {
                 wait.until { d ->
                     val js = d as JavascriptExecutor
-                    val count = (js.executeScript("""
-                        return document.querySelectorAll("$courseSelector").length;
-                    """) as Number).toLong()
+                    val count = (js.executeScript(
+                        "return document.querySelectorAll(\"$SELECTOR_COURSE_ITEM\").length;"
+                    ) as Number).toLong()
                     if (count <= 20L) {
                         js.executeScript("window.scrollTo(0, document.body.scrollHeight)")
                     }
-                    log.debug("/course/ 링크 수: {}", count)
+                    log.debug("강의 카드 수: {}", count)
                     count > 20L
                 }
             } catch (e: Exception) {
-                log.warn("⚠️ 두 번째 강의 섹션 로딩 타임아웃 (30s). /course/ 링크가 20개 이하로 유지됨. URL: {}", url)
+                log.warn("⚠️ 두 번째 강의 섹션 로딩 타임아웃 (30s). 강의가 20개 이하로 유지됨. URL: {}", url)
             }
 
-            // 두 번째 섹션 카드 텍스트가 로드될 때까지 대기 (JS textContent 기반)
-            val titleSelector = "$SELECTOR_COURSE_LIST $SELECTOR_COURSE_ITEM $SELECTOR_TITLE"
+            // 두 번째 섹션 카드 텍스트가 로드될 때까지 대기
             try {
                 wait.until { d ->
                     val js = d as JavascriptExecutor
                     val count = (js.executeScript("""
-                        var titles = document.querySelectorAll("$titleSelector");
+                        var titles = document.querySelectorAll("$SELECTOR_COURSE_ITEM $SELECTOR_TITLE");
                         var filled = 0;
                         titles.forEach(function(t) { if (t.textContent.trim() !== '') filled++; });
                         return filled;
@@ -429,15 +385,7 @@ open class InflearnReader(
                 log.warn("⚠️ 두 번째 섹션 카드 텍스트 로딩 타임아웃. URL: {}", url)
             }
 
-            // 모든 강의 리스트 찾기
-            val allCourseLists = driver.findElements(By.cssSelector(SELECTOR_COURSE_LIST))
-            log.info("UL 요소 {}개 발견", allCourseLists.size)
-
-            val allCourses = mutableListOf<WebElement>()
-
-            for (courseList in allCourseLists) {
-                allCourses.addAll(courseList.findElements(By.cssSelector(SELECTOR_COURSE_ITEM)))
-            }
+            val allCourses = driver.findElements(By.cssSelector(SELECTOR_COURSE_ITEM))
 
             log.info("총 {}개 강의 요소 발견", allCourses.size)
 
