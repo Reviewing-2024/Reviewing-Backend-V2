@@ -25,13 +25,13 @@ class Course (
     @Column(nullable = false)
     val title: String,
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2048)
     val url: String,
 
-    @Column(nullable = true)
+    @Column(nullable = true, length = 2048)
     val thumbnailImage: String? = null,
 
-    @Column(nullable = true)
+    @Column(nullable = true, length = 2048)
     val thumbnailVideo: String? = null,
 
     @Column(nullable = true)
