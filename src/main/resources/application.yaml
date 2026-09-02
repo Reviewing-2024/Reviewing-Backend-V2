@@ -62,10 +62,10 @@ app:
   frontend-url: http://localhost:5173
 
 slack:
-  bot-token: ""
+  bot-token: ${SLACK_BOT_TOKEN:}
   channel:
-    monitor: ""
-    member: ""
+    monitor: ${SLACK_CHANNEL_MONITOR:}
+    member: ${SLACK_CHANNEL_MEMBER:}
 
 channelTalk:
-  secret-key: ""
+  secret-key: ${CHANNEL_TALK_SECRET_KEY:}
