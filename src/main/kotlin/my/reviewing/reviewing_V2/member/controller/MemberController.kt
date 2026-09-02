@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import my.reviewing.reviewing_V2.course.dto.CourseResponseDto
 import my.reviewing.reviewing_V2.course.service.CourseService
 import my.reviewing.reviewing_V2.global.api.ApiResponse
+import my.reviewing.reviewing_V2.global.channeltalk.ChannelTalkService
 import my.reviewing.reviewing_V2.member.dto.UpdateNicknameRequestDto
 import my.reviewing.reviewing_V2.member.service.MemberService
 import my.reviewing.reviewing_V2.review.dto.MyReviewResponseDto
@@ -33,7 +34,8 @@ import org.springframework.web.multipart.MultipartFile
 class MemberController(
     private val memberService: MemberService,
     private val courseService: CourseService,
-    private val reviewService: ReviewService
+    private val reviewService: ReviewService,
+    private val channelTalkService: ChannelTalkService
 ) {
 
     @Operation(
@@ -120,6 +122,16 @@ class MemberController(
         val memberId = authentication.principal as Long
         memberService.updateProfileImage(memberId, file)
         return ResponseEntity.ok(ApiResponse.ok())
+    }
+
+    @Operation(
+        summary = "채널톡 멤버 ID 해시 인코딩",
+        security = [SecurityRequirement(name = "JWT")]
+    )
+    @GetMapping("/channelTalk/encode")
+    fun channelTalkMemberIdEncode(authentication: Authentication): ResponseEntity<ApiResponse<String>> {
+        val memberId = authentication.principal as Long
+        return ResponseEntity.ok(ApiResponse.ok(channelTalkService.encode(memberId.toString())))
     }
 
     // TODO: 임시 API - 프로덕션 배포 전 삭제

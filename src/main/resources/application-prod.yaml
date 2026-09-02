@@ -45,3 +45,12 @@ cloud:
       base-url: ${S3_BASE_URL}
     region:
       static: ap-northeast-2
+
+slack:
+  bot-token: ${SLACK_BOT_TOKEN}
+  channel:
+    monitor: ${SLACK_CHANNEL_MONITOR}
+    member: ${SLACK_CHANNEL_MEMBER}
+
+channelTalk:
+  secret-key: ${CHANNEL_TALK_SECRET_KEY}

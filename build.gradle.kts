@@ -82,6 +82,9 @@ dependencies {
 
 	// AWS SDK S3
 	implementation("software.amazon.awssdk:s3:2.29.52")
+
+	// Slack
+	implementation("com.slack.api:slack-api-client:1.44.0")
 }
 
 kotlin {

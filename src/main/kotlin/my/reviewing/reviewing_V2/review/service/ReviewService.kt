@@ -3,6 +3,7 @@ package my.reviewing.reviewing_V2.review.service
 import my.reviewing.reviewing_V2.crawling.repository.CourseRepository
 import my.reviewing.reviewing_V2.global.error.BusinessException
 import my.reviewing.reviewing_V2.global.error.ErrorCode
+import my.reviewing.reviewing_V2.global.slack.SlackService
 import my.reviewing.reviewing_V2.global.storage.FileStorageService
 import my.reviewing.reviewing_V2.member.repository.MemberRepository
 import my.reviewing.reviewing_V2.review.dto.MyReviewResponseDto
@@ -30,7 +31,8 @@ class ReviewService(
     private val reviewLikeRepository: ReviewLikeRepository,
     private val courseRepository: CourseRepository,
     private val memberRepository: MemberRepository,
-    private val fileStorageService: FileStorageService
+    private val fileStorageService: FileStorageService,
+    private val slackService: SlackService
 ) {
 
     fun createReview(courseId: UUID, memberId: Long, dto: ReviewRequestDto, certificationFile: MultipartFile) {
@@ -61,6 +63,7 @@ class ReviewService(
         )
         reviewRepository.save(review)
         courseRepository.incrementComments(courseId)
+        slackService.sendMessageToSlack(review)
     }
 
     fun checkBeforeCreateReview(courseId: UUID, memberId: Long) {

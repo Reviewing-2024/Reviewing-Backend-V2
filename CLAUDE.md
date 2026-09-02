@@ -12,7 +12,7 @@
 
 ```
 src/main/kotlin/my/reviewing/reviewing_V2/
-├── global/          # ApiResponse, SecurityConfig, JWTFilter/Util, GlobalExceptionHandler
+├── global/          # ApiResponse, SecurityConfig, JWTFilter/Util, GlobalExceptionHandler, SlackService, ChannelTalkService
 ├── member/          # AuthController, MemberController, CustomOAuth2MemberService
 ├── course/          # roller(찜 포함), CourseService, CourseWish
 ├── crawling/
@@ -55,6 +55,7 @@ src/main/kotlin/my/reviewing/reviewing_V2/
 | PATCH | /api/v1/admin/reviews/{id}/approve | 리뷰 승인 |
 | PATCH | /api/v1/admin/reviews/{id}/reject | 리뷰 거절 |
 | GET | /api/v1/search | 강의 검색 (하이브리드: keyword + vector) |
+| GET | /api/v1/members/channelTalk/encode | 채널톡 멤버 ID HMAC 인코딩 (JWT) |
 | GET | /api/v1/members/me/wishes | 내 찜 강의 목록 (JWT, page/size) |
 | GET | /api/v1/members/me/reviews | 내 리뷰 목록 (JWT, state 선택, page/size) |
 | PATCH | /api/v1/members/me/nickname | 닉네임 변경 (JWT) |
@@ -84,6 +85,8 @@ src/main/kotlin/my/reviewing/reviewing_V2/
 - [x] 관리자 기능
 - [x] Elasticsearch 인덱스 + 임베딩 배치
 - [x] 하이브리드 검색 API (BM25 + KNN 선형 합산, fuzziness 포함)
+- [x] Slack 알림 (리뷰 작성 시 monitor 채널, 신규 회원 가입 시 member 채널)
+- [x] 채널톡 HMAC 인코딩 API (GET /api/v1/members/channelTalk/encode)
 - [ ] RAG 챗봇 추천 API
 - [ ] 테스트 코드 작성
 

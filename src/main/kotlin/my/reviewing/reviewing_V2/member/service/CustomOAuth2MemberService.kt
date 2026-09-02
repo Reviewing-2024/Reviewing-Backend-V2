@@ -1,5 +1,6 @@
 package my.reviewing.reviewing_V2.member.service
 
+import my.reviewing.reviewing_V2.global.slack.SlackService
 import my.reviewing.reviewing_V2.member.dto.CustomOAuth2User
 import my.reviewing.reviewing_V2.member.dto.KakaoResponse
 import my.reviewing.reviewing_V2.member.dto.MemberDto
@@ -15,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class CustomOAuth2MemberService(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val slackService: SlackService
 ) : DefaultOAuth2UserService() {
 
     override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User? {
@@ -41,7 +43,9 @@ class CustomOAuth2MemberService(
                 name = name,
                 role = role
             )
-            memberRepository.save(member)
+            val newMember = memberRepository.save(member)
+            slackService.sendMessageToSlackForNewMember(newMember)
+            newMember
         } else {
             existMember
         }

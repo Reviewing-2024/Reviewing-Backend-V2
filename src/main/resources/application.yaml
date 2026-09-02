@@ -60,3 +60,12 @@ spring:
 
 app:
   frontend-url: http://localhost:5173
+
+slack:
+  bot-token: ""
+  channel:
+    monitor: ""
+    member: ""
+
+channelTalk:
+  secret-key: ""
